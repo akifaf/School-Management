@@ -18,7 +18,7 @@ urlpatterns = [
 
     path('students/', StudentList.as_view(), name='students'),
     path('student-register/', StudentRegisterView.as_view(), name='student-register'),
-    path('student-update/<int:pk>/', StudentListUpdateView.as_view(), name='student-update'),
+    path('student/<int:pk>/', StudentListUpdateView.as_view(), name='student-update'),
 
     path('teacher-register/', TeacherRegisterView.as_view(), name='teacher-register'),
     path('teacher/', TeacherList.as_view(), name='teacher'),
@@ -32,9 +32,5 @@ urlpatterns = [
 
     
     path('classroom/', ClassRoomAPIView.as_view(), name='classroom'),
-<<<<<<< HEAD
     path('classroom/<int:pk>/', ClassUpdateView.as_view(), name='classroom'),
-=======
-    path('classroom/<int:pk>/', ClassRoomAPIView.as_view(), name='classroom'),
->>>>>>> origin/main
 ]

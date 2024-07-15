@@ -29,15 +29,15 @@ const PrivateRouter = ({ children, ...rest }) => {
     if (decoded.is_admin){
       console.log("heloo");
     return <div>
-      <AdminDashboard />
+      <Navigate to='admin-dashboard' />
     </div>
     } else if (decoded.is_student) {
       return <div>
-        <StudentDashboard />
+      <Navigate to='student-dashboard' />
       </div>
     } else if (decoded.is_teacher) {
       return <div>
-        <TeacherDashboard />
+      <Navigate to='teacher-dashboard' />
       </div>
     } else {
       console.log("aeoi")

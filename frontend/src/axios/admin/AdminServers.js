@@ -98,7 +98,7 @@ export const fetchStudentDetails = createAsyncThunk(
   'student/fetchStudentDetails',
   async (id, { rejectWithValue }) => {
       try {
-          const response = await axios.get(`/student/detail/${id}/`);
+          const response = await axios.get(`/student/${id}/`);
           return response.data;
       } catch (error) {
           return rejectWithValue(error.response.data);
@@ -112,7 +112,7 @@ export const updateStudent = createAsyncThunk(
   async ({ id, studentData }, { rejectWithValue }) => {
     try {
       console.log(studentData);
-      const response = await axiosInstance.patch(`student-update/${id}/`, studentData);
+      const response = await axiosInstance.patch(`student/${id}/`, studentData);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);

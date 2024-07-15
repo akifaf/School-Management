@@ -3,15 +3,12 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from rest_framework import serializers
 from .models import TeacherFile, User, Student, Teacher, ClassRoom, Subject
-<<<<<<< HEAD
 from django.core.exceptions import ValidationError
-=======
->>>>>>> origin/main
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password', 'first_name', 'last_name', 'date_of_birth', 'address', 'phone_number', 'profile_picture', 'is_student', 'is_teacher', 'is_admin', 'is_active']
+        fields = ['id', 'username', 'email', 'password', 'first_name', 'last_name', 'date_of_birth', 'address', 'phone_number', 'is_student', 'is_teacher', 'is_admin', 'is_active']
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -62,7 +59,6 @@ class ClassroomSerializer(serializers.ModelSerializer):
         model = ClassRoom
         fields = '__all__'
 
-<<<<<<< HEAD
     # def validate(self, data):
     #     instance = ClassRoom(**data)
     #     try:
@@ -70,8 +66,6 @@ class ClassroomSerializer(serializers.ModelSerializer):
     #     except ValidationError as e:
     #         raise serializers.ValidationError(e.message_dict)
     #     return data
-=======
->>>>>>> origin/main
 
 class StudentSerializer(serializers.ModelSerializer):
     class_room = ClassroomSerializer

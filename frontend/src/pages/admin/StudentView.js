@@ -77,9 +77,9 @@ function StudentView() {
       if (response.error) {
         console.log(response, "error showing");
         if (response.error.email) {
-            toast.error(response.error.email);
+          toast.error(response.error.email);
         } else if (response.error.roll_no) {
-          toast.error(response.error.roll_no)
+          toast.error(response.error.roll_no);
         }
         toast.error(response.error);
       } else {
@@ -88,12 +88,12 @@ function StudentView() {
         toast.success("Student updated Successfully");
       }
     } catch (error) {
-        console.log(error, "error showing");
-        if (error.email) {
-            toast.error(error.email);
-        } else if (error.roll_no) {
-          toast.error(error.roll_no)
-        }
+      console.log(error, "error showing");
+      if (error.email) {
+        toast.error(error.email);
+      } else if (error.roll_no) {
+        toast.error(error.roll_no);
+      }
     }
   };
 
@@ -172,16 +172,19 @@ function StudentView() {
                   ID
                 </th>
                 <th scope="col" className="px-6 py-3">
+                  Image
+                </th>
+                <th scope="col" className="px-6 py-3">
                   Name
                 </th>
                 <th scope="col" className="px-6 py-3">
                   Admission Date
                 </th>
                 <th scope="col" className="px-6 py-3">
-                  Parent Number
+                  Action
                 </th>
                 <th scope="col" className="px-6 py-3">
-                  Action
+                  Edit
                 </th>
               </tr>
             </thead>
@@ -212,6 +215,15 @@ function StudentView() {
                     className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
                   >
                     <td className="px-6 py-4">{student.roll_no}</td>
+                    <td>
+                      <div className="w-20 rounded-full">
+                        <img
+                          className="object-cover rounded-full"
+                          src={student.profile_picture}
+                          alt="Student Profile"
+                        />
+                      </div>
+                    </td>
                     <th
                       scope="row"
                       className="flex items-center px-6 py-4 text-gray-900 dark:text-white"

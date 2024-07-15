@@ -106,7 +106,7 @@ class PasswordResetConfirmView(generics.GenericAPIView):
         return Response({"detail": "Password has been reset successfully."}, status=status.HTTP_200_OK)
 
 class StudentListUpdateView(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAdminUser, IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     serializer_class = StudentSerializer
 
     def get_object(self):
@@ -147,11 +147,7 @@ class SubjectUpdateView(generics.RetrieveUpdateDestroyAPIView):
 class TeacherList(generics.ListAPIView):
     queryset = Teacher.objects.all()
     serializer_class = TeacherSerializer
-<<<<<<< HEAD
     permission_classes = [IsAuthenticated]
-=======
-    permission_classes = [AllowAny]
->>>>>>> origin/main
 
 class TeacherView(generics.RetrieveUpdateAPIView):
     serializer_class = TeacherSerializer
@@ -188,7 +184,7 @@ class TeacherDetailView(APIView):
 
 
 class BlockUserView(APIView):
-    permission_classes = [IsAdminUser]
+    # permission_classes = [IsAdminUser]
 
     def post(self, request, pk):
         try:
@@ -215,7 +211,6 @@ class UnBlockUserView(APIView):
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
         
         
-<<<<<<< HEAD
 class ClassRoomAPIView(generics.ListCreateAPIView):
     queryset = ClassRoom.objects.all()
     serializer_class = ClassroomSerializer
@@ -235,30 +230,6 @@ class ClassUpdateView(generics.RetrieveUpdateDestroyAPIView):
     #     class_obj = ClassRoom.objects.all()
     #     serializer = ClassroomSerializer(class_obj, many=True)
     #     return Response(serializer.data)
-=======
-class ClassRoomAPIView(generics.RetrieveDestroyAPIView):
-    queryset = ClassRoom.objects.all()
-    serializer_class = ClassroomSerializer
-    # # permission_classes = [IsAdminUser, IsAuthenticated]
-    
-    def list(self, request):
-        # Note the use of `get_queryset()` instead of `self.queryset`
-        queryset = self.get_queryset()
-        serializer = ClassroomSerializer(queryset, many=True)
-        return Response(serializer.data)
-    
-    def get(self, request):
-        class_obj = ClassRoom.objects.all()
-        serializer = ClassroomSerializer(class_obj, many=True)
-        return Response(serializer.data)
-    
-    def post(self, request):
-        serializerObj = ClassroomSerializer(data=request.data)
-        if serializerObj.is_valid():
-            serializerObj.save()
-            return Response("Created Successfully")
-        return Response(serializerObj.error)
->>>>>>> origin/main
     
 
 

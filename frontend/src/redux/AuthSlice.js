@@ -12,7 +12,6 @@ const initialState = {
   is_student: false,
   is_teacher: false,
   loading: true,
-  sta: '',
   error: null,
 };
 
@@ -53,7 +52,6 @@ const authSlice = createSlice({
         state.accessToken = action.payload.access;
         state.refreshToken = action.payload.refresh;
         state.loading = false;
-        state.sta = 'hello'
         state.is_authenticated = true;
         state.is_admin = decodedToken.is_admin
         state.is_teacher = decodedToken.is_teacher

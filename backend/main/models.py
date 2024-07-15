@@ -1,10 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils.translation import gettext_lazy as _
-<<<<<<< HEAD
 from django.core.exceptions import ValidationError
-=======
->>>>>>> origin/main
 
 
 class MyAccountManager(BaseUserManager):
@@ -105,13 +102,10 @@ class ClassRoom(models.Model):
     
     def get_class(self):
         return f'{self.class_no} {self.section}'
-<<<<<<< HEAD
     
     def clean(self):
         if ClassRoom.objects.filter(class_no=self.class_no, section=self.section).exclude(id=self.id).exists():
             raise ValidationError(f"ClassRoom with class_no {self.class_no} and section {self.section} already exists.")
-=======
->>>>>>> origin/main
 
 class Student(User):
     # user = models.OneToOneField(User, on_delete=models.CASCADE)
