@@ -90,7 +90,7 @@ class StudentRegisterView(generics.CreateAPIView):
         send_password_set_email(student)
 
 class TeacherRegisterView(generics.CreateAPIView):
-    permission_classes = [IsAdminUser, IsAuthenticated]
+    # permission_classes = [IsAdminUser, IsAuthenticated]
     queryset = Teacher.objects.all()
     serializer_class = TeacherSerializer
 

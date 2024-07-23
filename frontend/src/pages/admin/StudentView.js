@@ -131,8 +131,10 @@ function StudentView({ classRoom }) {
               />
             </div>
             <div>
+            {console.log(classRoom.id)}
+            <Link to="" state={{ some: "value" }} />
               <Link
-                to="/add-student"
+              to="/add-student" state={{ classRoom: classRoom.id}}
                 className="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700"
               >
                 Add Student
@@ -324,44 +326,6 @@ function StudentView({ classRoom }) {
                 </div>
               </div>
               <div className="flex flex-wrap -mx-3 mb-6">
-                {/* <div className="w-full px-3">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="password">Password</label>
-                  <input
-                    className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-                    id="password"
-                    name="password"
-                    type="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    placeholder="******************"
-                  />
-                </div> */}
-                {/* <div className="w-full px-3">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="password2">Confirm Password</label>
-                  <input
-                    className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-                    id="password2"
-                    name="password2"
-                    type="password"
-                    value={formData.password2}
-                    onChange={handleChange}
-                    placeholder="******************"
-                  />
-                </div> */}
-              </div>
-              {/* <div className="flex flex-wrap -mx-3 mb-6">
-                <div className="w-full px-3">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="profile_picture">Profile Picture</label>
-                  <input
-                    className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-                    id="profile_picture"
-                    name="profile_picture"
-                    type="file"
-                    onChange={handleFileChange}
-                  />
-                </div>
-              </div> */}
-              <div className="flex flex-wrap -mx-3 mb-6">
                 <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
                   <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
                     Phone Number
@@ -441,7 +405,6 @@ function StudentView({ classRoom }) {
                     value={formData.class_room}
                     onChange={handleChange}
                   >
-                    <option value={formData.class_room}></option>
                     {classRooms.map((classRoom) => (
                       <option key={classRoom.id} value={classRoom.id}>
                         {classRoom.class_no} {classRoom.section}

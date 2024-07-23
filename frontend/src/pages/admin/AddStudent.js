@@ -4,9 +4,11 @@ import { studentRegister } from "../../axios/admin/AdminServers";
 import { axiosInstance } from "../../axios/AxiosInstance";
 import AdminLayout from "../../layout/AdminLayout";
 import { Toaster, toast } from "sonner";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 
 const AddStudent = () => {
+  let { state } = useLocation();
+  const {classRoom} = state;
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -20,7 +22,7 @@ const AddStudent = () => {
     address: "",
     profile_picture: null,
     roll_no: "",
-    class_room: "",
+    class_room: classRoom,
     admission_date: "",
   });
 
@@ -28,7 +30,6 @@ const AddStudent = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -43,10 +44,11 @@ const AddStudent = () => {
       profile_picture: e.target.files[0],
     });
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      console.log(formData.class_room);
       const response = await studentRegister({
         phone_number: formData.phone_number,
         admission_date: formData.admission_date,
@@ -66,17 +68,18 @@ const AddStudent = () => {
           toast.error("Something went wrong");
         }
       } else {
-        alert(`Student registered successfully. Password reset link is sent to ${formData.email}. `);
-        navigate('/student-management')
+        alert(
+          `Student registered successfully. Password reset link is sent to ${formData.email}. `
+        );
+        navigate("/student-management");
       }
-      
     } catch (error) {
-      alert(error)
+      alert(error);
     }
-    
   };
 
   useEffect(() => {
+    console.log(formData);
     axiosInstance
       .get("classroom/")
       .then((response) => setClassRooms(response.data))
@@ -166,59 +169,6 @@ const AddStudent = () => {
               />
             </div>
           </div>
-          {/* <div className="flex flex-wrap -mx-3 mb-6">
-            <div className="w-full px-3">
-              <label
-                className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-                htmlFor="password"
-              >
-                Password
-              </label>
-              <input
-                className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-                id="password"
-                name="password"
-                type="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="******************"
-              />
-            </div>
-            <div className="w-full px-3">
-              <label
-                className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-                htmlFor="password"
-              >
-                Confirm Password
-              </label>
-              <input
-                className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-                id="password2"
-                name="password2"
-                type="password"
-                value={formData.password2}
-                onChange={handleChange}
-                placeholder="******************"
-              />
-            </div>
-          </div> */}
-          {/* <div className="flex flex-wrap -mx-3 mb-6">
-            <div className="w-full px-3">
-              <label
-                className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-                htmlFor="profile_picture"
-              >
-                Profile Picture
-              </label>
-              <input
-                className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-                id="profile_picture"
-                name="profile_picture"
-                type="file"
-                onChange={handleFileChange}
-              />
-            </div>
-          </div> */}
           <div className="flex flex-wrap -mx-3 mb-6">
             <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
               <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
@@ -299,7 +249,6 @@ const AddStudent = () => {
                 value={formData.class_room}
                 onChange={handleChange}
               >
-                <option value="">-------------</option>
                 {classRooms.map((classRoom) => (
                   <option key={classRoom.id} value={classRoom.id}>
                     {classRoom.class_no} {classRoom.section}

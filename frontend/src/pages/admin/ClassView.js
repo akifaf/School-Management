@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { axiosInstance } from "../../axios/AxiosInstance";
 import { Toaster } from "sonner";
 import StudentView from "./StudentView";
+import { teacherList } from "../../axios/admin/AdminServers";
 
 function ClassView() {
   const dispatch = useDispatch();
   const [classRooms, setClassRooms] = useState([]);
   const [selectedClass, setSelectedClass] = useState(null);
+  const teachers = useSelector((state) => state.teacher.teachers_list);
+  const teacherStatus = useSelector((state) => state.teacher.status);
 
   useEffect(() => {
     axiosInstance
@@ -15,6 +18,12 @@ function ClassView() {
       .then((response) => setClassRooms(response.data))
       .catch((error) => console.error("Error fetching classrooms:", error));
   }, []);
+
+  useEffect(() => {
+    if (!teachers && teacherStatus !== 'loading') {
+      dispatch(teacherList());
+    }
+  }, [dispatch, teachers, teacherStatus]);
 
   const handleClassClick = (classItem) => {
     setSelectedClass(classItem);
@@ -42,7 +51,7 @@ function ClassView() {
                 {`Section ${classItem.section}`}
               </p>
               <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
-                {`Class Teacher: ${classItem.class_teacher}`}
+              {`Class Teacher: ${teachers ? (teachers.find(teacher => teacher.id === classItem.class_teacher)?.username) : null }`}
               </p>
             </div>
           ))}
