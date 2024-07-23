@@ -7,17 +7,8 @@ import teacherReducer from '../redux/TeacherSlice';
 import classroomReducer from '../redux/ClassSlice';
 import storage from 'redux-persist/lib/storage';
 import teacherDetailReducer from '../redux/TeacherDetailSlice';
-
-import {
-    persistStore,
-    persistReducer,
-    FLUSH,
-    REHYDRATE,
-    PAUSE,
-    PERSIST,
-    PURGE,
-    REGISTER,
-} from 'redux-persist'
+import studentDetailReducer from '../redux/StudentDetailSlice';
+import {persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER, } from 'redux-persist'
 
 const persistConfig = {
   key: 'root',
@@ -32,6 +23,7 @@ const rootReducer = {
   classroom: classroomReducer,
   teacher: teacherReducer,
   teacherDetail: teacherDetailReducer,
+  studentDetail: studentDetailReducer,
 };
 
 const store = configureStore({

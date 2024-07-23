@@ -1,37 +1,78 @@
-import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import defaultProfile from '../../images/user/default_profile.png'
-import { useDispatch, useSelector } from 'react-redux'
-import { fetchStudentDetails } from '../../axios/admin/AdminServers'
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import defaultProfile from '../../images/user/default_profile.png';
+import { useDispatch, useSelector } from 'react-redux';
+import {  updateStudent, uploadProfilePicture } from '../../axios/admin/AdminServers'; // Assuming you have an API function to upload profile picture
+import { toast, Toaster } from 'sonner'; // Assuming you have a toast notification component
+import { fetchStudentDetails } from '../../redux/StudentDetailSlice';
+import { updateStudentProfile } from '../../axios/student/StudentServers';
 
 function StudentProfile() {
-  const { user } = useSelector(store => store.auth)
-  const dispatch = useDispatch()
-  const [studentDetails, setStudentDetails] = useState(null)
-  
+  const { user } = useSelector(store => store.auth);
+  const dispatch = useDispatch();
+  const [studentDetails, setStudentDetails] = useState(null);
+  const [profilePicture, setProfilePicture] = useState(null); // State to hold profile picture file
+
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        const details = await dispatch(fetchStudentDetails(user.id))
-        setStudentDetails(details.payload)
+        const details = await dispatch(fetchStudentDetails(user.id));
+        setStudentDetails(details.payload);
       } catch (error) {
-        console.log("Error fetching student details: ", error)
+        console.log("Error fetching student details: ", error);
       }
+    };
+    fetchDetails();
+  }, [dispatch, user.id]);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      console.log(file);
+      setProfilePicture(file);
     }
-    fetchDetails()
-  }, [dispatch, user.id])
+  };
+
+  const handleUploadProfilePicture = async () => {
+    if (profilePicture) {
+      const formData = new FormData();
+      formData.append('profile_picture', profilePicture); 
+  
+      try {
+        const response = await updateStudentProfile(user.id, formData); 
+        console.log('respsssssssss', response);
+        if (response.error) {
+          console.log(response.error)
+          toast.error("Failed to upload profile picture.");
+        } else {
+          toast.success("Profile picture uploaded successfully.");
+          
+          const updatedDetails = await dispatch(fetchStudentDetails(user.id));
+          setStudentDetails(updatedDetails.payload);
+        }
+      } catch (error) {
+        console.error("Error uploading profile picture: ", error);
+        toast.error("Failed to upload profile picture. Please try again.");
+      }
+    } else {
+      toast.error("Please select a profile picture to upload.");
+    }
+  };
+  
 
   if (!studentDetails) {
-    return <div>Loading...</div>
+    return <div>Loading...</div>;
   }
 
   return (
     <div>
+      <Toaster position="top-center" richColors />
+
       <div className="overflow-hidden rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="px-4 pb-6 text-center">
           <div className="relative z-30 mx-auto mt-2 h-30 w-full max-w-30 rounded-full bg-white/20 p-1 backdrop-blur sm:h-44 sm:max-w-44 sm:p-3">
             <div className="relative drop-shadow-2">
-              <img src={studentDetails.profile_picture ? studentDetails.profile_picture: defaultProfile} alt="profile" />
+              <img src={studentDetails.profile_picture ? studentDetails.profile_picture : defaultProfile} alt="profile" />
               <label
                 htmlFor="profile"
                 className="absolute bottom-0 right-0 flex h-8.5 w-8.5 cursor-pointer items-center justify-center rounded-full bg-primary text-white hover:bg-opacity-90 sm:bottom-2 sm:right-2"
@@ -59,9 +100,10 @@ function StudentProfile() {
                 </svg>
                 <input
                   type="file"
-                  name="profile"
+                  name="profile_picture"
                   id="profile"
                   className="sr-only"
+                  onChange={handleFileChange} 
                 />
               </label>
             </div>
@@ -104,53 +146,14 @@ function StudentProfile() {
         </div>
       </div>
 
-      <div className="my-3 grid gap-5 sm:grid-cols-2">
-        <Link
-          to="/student/dashboard"
-          className="flex justify-center rounded-sm border border-stroke bg-white p-6 shadow-default dark:border-strokedark dark:bg-boxdark"
-        >
-          <div>
-            <h3 className="mb-1 text-[20px] font-semibold text-black dark:text-white">
-              Subjects
-            </h3>
-          </div>
-        </Link>
-
-        <Link
-          to="/student/dashboard"
-          className="flex justify-center rounded-sm border border-stroke bg-white p-6 shadow-default dark:border-strokedark dark:bg-boxdark"
-        >
-          <div>
-            <h3 className="mb-1 text-[20px] font-semibold text-black dark:text-white">
-              Classes
-            </h3>
-          </div>
-        </Link>
-
-        <Link
-          to="/student/dashboard"
-          className="flex justify-center rounded-sm border border-stroke bg-white p-6 shadow-default dark:border-strokedark dark:bg-boxdark"
-        >
-          <div>
-            <h3 className="mb-1 text-[20px] font-semibold text-black dark:text-white">
-              Teachers
-            </h3>
-          </div>
-        </Link>
-
-        <Link
-          to="/student/dashboard"
-          className="flex justify-center rounded-sm border border-stroke bg-white p-6 shadow-default dark:border-strokedark dark:bg-boxdark"
-        >
-          <div>
-            <h3 className="mb-1 text-[20px] font-semibold text-black dark:text-white">
-              Parents
-            </h3>
-          </div>
-        </Link>
-      </div>
+      <button
+        className="mt-4 bg-primary hover:bg-opacity-90 text-white font-semibold py-2 px-8 rounded-md"
+        onClick={handleUploadProfilePicture} // Handle profile picture upload
+      >
+        Upload Profile Picture
+      </button>
     </div>
-  )
+  );
 }
 
-export default StudentProfile
+export default StudentProfile;

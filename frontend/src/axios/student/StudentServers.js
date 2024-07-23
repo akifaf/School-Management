@@ -1,16 +1,11 @@
-// import { createAsyncThunk } from '@reduxjs/toolkit';
-// import axios from "../axios";
-// import { axiosFormInstance, axiosInstance } from "../AxiosInstance";
+import { axiosFormInstance } from "../AxiosInstance";
 
-// export const fetchStudentDetails = createAsyncThunk(
-//     'student/fetchStudentDetails',
-//     async (id, { rejectWithValue }) => {
-//         try {
-//             const response = await axiosInstance.get(`/student/detail/${id}/`);
-//             return response.data;
-//         } catch (error) {
-//             return rejectWithValue(error.response.data);
-//         }
-//     }
-//   );
-  
+export const updateStudentProfile = async (id, studentData) => {
+  try {
+    const response = await axiosFormInstance.patch(`student/${id}/`, studentData);
+    console.log(response);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};

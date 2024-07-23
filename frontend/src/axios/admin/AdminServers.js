@@ -19,6 +19,17 @@ export const studentList = createAsyncThunk('student/studentList', async (_, thu
   }
 });
 
+export const studentListByClass = createAsyncThunk(
+  'students/fetchByClass',
+  async ({ class_no, section }, thunkAPI) => {
+    try {
+      const response = await axiosInstance.get(`students/${class_no}/${section}/`);
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
 
 export const studentRegister = async (studentData) => {
   try {
@@ -80,17 +91,17 @@ export const classRoomList = createAsyncThunk('classrooms/class_list', async () 
 })
 
 export const addClassRoom = createAsyncThunk('classrooms/add', async (classRoomData) => {
-  const response = await axiosInstance.post('/classrooms/', classRoomData);
-  return response.data;
+  const response = await axiosInstance.post('/classroom/', classRoomData);
+  return response;
 });
 
 export const editClassRoom = createAsyncThunk('classrooms/edit', async ({ id, classRoomData }) => {
-  const response = await axiosInstance.put(`/classrooms/${id}/`, classRoomData);
+  const response = await axiosInstance.put(`/classroom/${id}/`, classRoomData);
   return response.data;
 });
 
 export const deleteClassRoom = createAsyncThunk('classrooms/delete', async (id) => {
-  await axiosInstance.delete(`/classrooms/${id}/`);
+  await axiosInstance.delete(`/classroom/${id}/`);
   return id;
 });
 
@@ -107,12 +118,24 @@ export const fetchStudentDetails = createAsyncThunk(
 );
 
 
+export const fetchTeacherDetails = createAsyncThunk(
+  'student/fetchTeacherDetails',
+  async (id, { rejectWithValue }) => {
+      try {
+          const response = await axios.get(`/teacher-update/${id}/`);
+          return response.data;
+      } catch (error) {
+          return rejectWithValue(error.response.data);
+      }
+  }
+);
+
+
 export const updateStudent = createAsyncThunk(
   'student/updateStudent',
   async ({ id, studentData }, { rejectWithValue }) => {
     try {
-      console.log(studentData);
-      const response = await axiosInstance.patch(`student/${id}/`, studentData);
+      const response = await axiosFormInstance.patch(`student/${id}/`, studentData);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);

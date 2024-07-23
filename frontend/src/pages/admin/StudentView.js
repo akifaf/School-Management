@@ -3,15 +3,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import {
   blockUser,
-  studentList,
+  studentListByClass,
   unblockUser,
   updateStudent,
 } from "../../axios/admin/AdminServers";
-import { axiosInstance } from "../../axios/AxiosInstance";
 import { Toaster, toast } from "sonner";
-import { loginUser } from "../../axios/apiServers";
+import { axiosInstance } from "../../axios/AxiosInstance";
 
-function StudentView() {
+function StudentView({ classRoom }) {
   const dispatch = useDispatch();
   const { student_list, status, error } = useSelector((store) => store.student);
   const [editingUser, setEditingUser] = useState(null);
@@ -19,8 +18,7 @@ function StudentView() {
     first_name: "",
     last_name: "",
     email: "",
-    password: "",
-    password2: "",
+    username: "",
     phone_number: "",
     parent_contact: "",
     date_of_birth: "",
@@ -29,6 +27,11 @@ function StudentView() {
     class_room: "",
     roll_no: "",
   });
+
+  useEffect(() => {
+    console.log(classRoom.class_no, classRoom.section);
+    dispatch(studentListByClass({class_no:classRoom.class_no, section:classRoom.section}));
+  }, [dispatch, classRoom]);
 
   const handleEditUser = (student) => {
     setEditingUser(student);
@@ -53,16 +56,12 @@ function StudentView() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(editingUser.id, editingUser.id, "hello");
 
     const formDataToSend = new FormData();
     formDataToSend.append("first_name", formData.first_name);
     formDataToSend.append("last_name", formData.last_name);
     formDataToSend.append("email", formData.email);
-    formDataToSend.append(
-      "username",
-      formData.first_name + " " + formData.last_name
-    );
+    formDataToSend.append("username", formData.username);
     formDataToSend.append("admission_date", formData.admission_date);
     formDataToSend.append("roll_no", formData.roll_no);
     formDataToSend.append("class_room", formData.class_room);
@@ -72,65 +71,40 @@ function StudentView() {
       const response = await dispatch(
         updateStudent({ id: editingUser.id, studentData: formDataToSend })
       ).unwrap();
-      console.log(response);
       setEditingUser(null);
       if (response.error) {
-        console.log(response, "error showing");
-        if (response.error.email) {
-          toast.error(response.error.email);
-        } else if (response.error.roll_no) {
-          toast.error(response.error.roll_no);
-        }
         toast.error(response.error);
       } else {
-        dispatch(studentList());
-        console.log("success");
-        toast.success("Student updated Successfully");
+        
+    dispatch(studentListByClass({class_no:classRoom.class_no, section:classRoom.section}));
+        toast.success("Student updated successfully");
       }
     } catch (error) {
-      console.log(error, "error showing");
-      if (error.email) {
-        toast.error(error.email);
-      } else if (error.roll_no) {
-        toast.error(error.roll_no);
-      }
+      toast.error(error.message);
     }
   };
 
   const handleBlockUser = async (student) => {
     try {
-      const response = await dispatch(blockUser({ id: student.id }));
-      dispatch(studentList());
+      await dispatch(blockUser({ id: student.id }));
+      
+    dispatch(studentListByClass({class_no:classRoom.class_no, section:classRoom.section}));
       toast.success(`User ${student.username} has been blocked successfully!`);
-      console.log(response);
     } catch (error) {
-      toast.error(
-        `Failed to block user ${student.username}. Please try again.`
-      );
-      console.log(error);
+      toast.error(`Failed to block user ${student.username}. Please try again.`);
     }
   };
 
   const handleUnblockUser = async (student) => {
     try {
-      const response = await dispatch(unblockUser({ id: student.id }));
-      dispatch(studentList());
-      toast.success(
-        `User ${student.username} has been unblocked successfully!`
-      );
-      console.log(response);
+      await dispatch(unblockUser({ id: student.id }));
+      
+    dispatch(studentListByClass({class_no:classRoom.class_no, section:classRoom.section}));
+      toast.success(`User ${student.username} has been unblocked successfully!`);
     } catch (error) {
-      toast.error(
-        `Failed to unblock user ${student.username}. Please try again.`
-      );
-      console.log(error);
+      toast.error(`Failed to unblock user ${student.username}. Please try again.`);
     }
   };
-
-  useEffect(() => {
-    dispatch(studentList());
-  }, [dispatch]);
-
   const [classRooms, setClassRooms] = useState([]);
 
   useEffect(() => {
@@ -139,13 +113,13 @@ function StudentView() {
       .then((response) => setClassRooms(response.data))
       .catch((error) => console.error("Error fetching classrooms:", error));
   }, []);
-
   return (
     <>
-      <h1 className="text-3xl text-gray-900 mx-3 pb-4 font-bold">
-        Student Management
-      </h1>
+      <h2 className="text-2xl text-gray-900 mx-3 pb-4 font-bold">
+        Students in Class {classRoom.class_no} Section {classRoom.section}
+      </h2>
       <Toaster position="top-center" richColors />
+
       {!editingUser ? (
         <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
           <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-900">
@@ -171,9 +145,9 @@ function StudentView() {
                 <th scope="col" className="px-6 py-3">
                   ID
                 </th>
-                <th scope="col" className="px-6 py-3">
+                {/* <th scope="col" className="px-6 py-3">
                   Image
-                </th>
+                </th> */}
                 <th scope="col" className="px-6 py-3">
                   Name
                 </th>
@@ -215,7 +189,7 @@ function StudentView() {
                     className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
                   >
                     <td className="px-6 py-4">{student.roll_no}</td>
-                    <td>
+                    {/* <td>
                       <div className="w-20 rounded-full">
                         <img
                           className="object-cover rounded-full"
@@ -223,7 +197,7 @@ function StudentView() {
                           alt="Student Profile"
                         />
                       </div>
-                    </td>
+                    </td> */}
                     <th
                       scope="row"
                       className="flex items-center px-6 py-4 text-gray-900 dark:text-white"
@@ -289,8 +263,7 @@ function StudentView() {
           </table>
         </div>
       ) : (
-        <>
-          <form className="m-5" onSubmit={handleSubmit}>
+        <form className="m-5" onSubmit={handleSubmit}>
             <div className="p-5 border bg-white">
               <div className="flex flex-wrap -mx-3 mb-6">
                 <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
@@ -508,7 +481,6 @@ function StudentView() {
               </div>
             </div>
           </form>
-        </>
       )}
     </>
   );

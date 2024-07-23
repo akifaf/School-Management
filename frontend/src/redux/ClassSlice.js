@@ -1,4 +1,3 @@
-// src/redux/slices/classroomSlice.js
 import { createSlice } from '@reduxjs/toolkit';
 import { addClassRoom, classRoomList, deleteClassRoom, editClassRoom } from '../axios/admin/AdminServers';
 

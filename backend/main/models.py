@@ -107,6 +107,11 @@ class ClassRoom(models.Model):
         if ClassRoom.objects.filter(class_no=self.class_no, section=self.section).exclude(id=self.id).exists():
             raise ValidationError(f"ClassRoom with class_no {self.class_no} and section {self.section} already exists.")
 
+
+    def is_full(self):
+        MAX_STUDENTS_PER_CLASS = 3
+        return self.student_set.count() >= MAX_STUDENTS_PER_CLASS
+
 class Student(User):
     # user = models.OneToOneField(User, on_delete=models.CASCADE)
     roll_no = models.IntegerField(unique=True)

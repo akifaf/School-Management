@@ -22,6 +22,8 @@ import TeacherLayout from "./layout/TeacherLayout";
 import StudentProfile from "./pages/student/Profile";
 import TeacherProfile from "./pages/teacher/Profile";
 import ClassRoomView from "./pages/admin/ClassRoomView";
+import ClassView from "./pages/admin/ClassView";
+import AddClassRoom from "./pages/admin/AddClassRoom";
 
 export default function App() {
   return (
@@ -35,7 +37,7 @@ export default function App() {
           {/* Admin Side */}
           <Route element={<AdminLayout />}>
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
-            <Route path="/student-management" element={<StudentView />} />
+            <Route path="/student-management" element={<ClassView />} />
             <Route path="/add-student" element={<AddStudent />} />
 
             <Route path="/teacher-management" element={<TeacherView />} />
@@ -45,6 +47,7 @@ export default function App() {
             <Route path="/add-subject" element={<AddSubject />} />
 
             <Route path="/class" element={<ClassRoomView />} />
+            <Route path="/add-classroom" element={<AddClassRoom />} />
 
             <Route path="/admin-profile" element={<Profile />} />
 

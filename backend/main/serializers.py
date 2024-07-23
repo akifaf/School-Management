@@ -59,14 +59,16 @@ class ClassroomSerializer(serializers.ModelSerializer):
         model = ClassRoom
         fields = '__all__'
 
-    # def validate(self, data):
-    #     instance = ClassRoom(**data)
-    #     try:
-    #         instance.clean()
-    #     except ValidationError as e:
-    #         raise serializers.ValidationError(e.message_dict)
-    #     return data
+    def validate(self, attrs):
+        if self.instance: 
+            if ClassRoom.objects.filter(class_no=attrs.get('class_no'), section=attrs.get('section')).exclude(id=self.instance.id).exists():
+                raise serializers.ValidationError("ClassRoom with this Class No and Section already exists.")
+        else: 
+            if ClassRoom.objects.filter(class_no=attrs.get('class_no'), section=attrs.get('section')).exists():
+                raise serializers.ValidationError("ClassRoom with this Class No and Section already exists.")
 
+        return attrs
+    
 class StudentSerializer(serializers.ModelSerializer):
     class_room = ClassroomSerializer
     class Meta:

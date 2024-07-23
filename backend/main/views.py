@@ -3,12 +3,14 @@ from django.shortcuts import render, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.http.response import JsonResponse
 
+from rest_framework.exceptions import ValidationError
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.exceptions import NotFound
 
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode
@@ -76,6 +78,12 @@ class StudentRegisterView(generics.CreateAPIView):
     permission_classes = [IsAdminUser, IsAuthenticated]
 
     def perform_create(self, serializer):
+        class_room = serializer.validated_data['class_room']
+        
+        # Check if the class is full
+        if class_room.is_full():
+            raise ValidationError(f"Class {class_room.get_class()} is full. Please assign the student to a different class or create a new section.")
+        
         student = serializer.save(is_student=True)
         print(student, 'student')
         print(student.email, 'email')
@@ -105,13 +113,27 @@ class PasswordResetConfirmView(generics.GenericAPIView):
 
         return Response({"detail": "Password has been reset successfully."}, status=status.HTTP_200_OK)
 
+class StudentListByClassView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, class_no, section):
+        try:
+            class_room = ClassRoom.objects.get(class_no=class_no, section=section)
+        except ClassRoom.DoesNotExist:
+            raise NotFound(detail="ClassRoom not found")
+        
+        students = Student.objects.filter(class_room=class_room)
+        serializer = StudentSerializer(students, many=True)
+        return Response(serializer.data)
+
 class StudentListUpdateView(generics.RetrieveUpdateDestroyAPIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     serializer_class = StudentSerializer
 
     def get_object(self):
         pk = self.kwargs.get('pk')
         return get_object_or_404(Student, id=pk)
+    
 
     # def put(self,request,*args, **kwargs):
     #     instance = self.get_object()
@@ -151,7 +173,7 @@ class TeacherList(generics.ListAPIView):
 
 class TeacherView(generics.RetrieveUpdateAPIView):
     serializer_class = TeacherSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get_object(self):
         pk = self.kwargs.get('pk')
@@ -214,7 +236,7 @@ class UnBlockUserView(APIView):
 class ClassRoomAPIView(generics.ListCreateAPIView):
     queryset = ClassRoom.objects.all()
     serializer_class = ClassroomSerializer
-    # # permission_classes = [IsAdminUser, IsAuthenticated]
+    # permission_classes = [IsAdminUser, IsAuthenticated]
 
 
 class ClassUpdateView(generics.RetrieveUpdateDestroyAPIView):

@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import {  studentList, updateStudent } from "../axios/admin/AdminServers";
+import {  studentList, studentListByClass, updateStudent } from "../axios/admin/AdminServers";
 // import { studentList } from "../axios/AdminServers";
 
 const initialState = {
@@ -13,15 +13,28 @@ const studentSlice = createSlice({
     initialState,
     reducers: {},
     extraReducers: (builder) => {
-        builder
-            .addCase(studentList.fulfilled, (state, action) => {
-                state.student_list = action.payload;
-                state.status = 'successful';
+        builder 
+            .addCase(studentListByClass.pending, (state) => {
+              state.loading = true;
+              state.error = null;
             })
-            .addCase(studentList.rejected, (state, action) => {
-                state.error = action.error.message;
-                state.status = 'failed';
+            .addCase(studentListByClass.fulfilled, (state, action) => {
+              state.loading = false;
+              state.student_list = action.payload;
+              state.status = 'successful';
             })
+            .addCase(studentListByClass.rejected, (state, action) => {
+              state.loading = false;
+              state.error = action.payload;
+            })
+            // .addCase(studentList.fulfilled, (state, action) => {
+            //     state.student_list = action.payload;
+            //     state.status = 'successful';
+            // })
+            // .addCase(studentList.rejected, (state, action) => {
+            //     state.error = action.error.message;
+            //     state.status = 'failed';
+            // })
             .addCase(updateStudent.pending, (state) => {
                 state.status = 'loading';
             })
