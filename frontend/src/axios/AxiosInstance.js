@@ -1,5 +1,5 @@
 import axios from "axios";
-import { API_BASE_URL } from "../constants/urls";
+import { API_BASE_URL, ATTENDANCE } from "../constants/urls";
 import { refreshauthToken } from "./apiServers";
 import { jwtDecode } from "jwt-decode";
 import dayjs from "dayjs";
@@ -72,3 +72,11 @@ axiosFormInstance.interceptors.request.use(
         return Promise.reject(error)
     }
 );
+
+
+export const axiosAttendanceInstance = axios.create({
+    baseURL: ATTENDANCE,
+    headers: {
+        'Content-Type': 'application/json'
+    }
+});

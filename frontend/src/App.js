@@ -24,6 +24,8 @@ import TeacherProfile from "./pages/teacher/Profile";
 import ClassRoomView from "./pages/admin/ClassRoomView";
 import ClassView from "./pages/admin/ClassView";
 import AddClassRoom from "./pages/admin/AddClassRoom";
+import AttendanceForm from "./pages/TakeAttendance";
+import ViewAttendance from "./pages/ViewAttendance";
 
 export default function App() {
   return (
@@ -49,6 +51,8 @@ export default function App() {
             <Route path="/class" element={<ClassRoomView />} />
             <Route path="/add-classroom" element={<AddClassRoom />} />
 
+            <Route path="/attendance" element={<ViewAttendance /> }/>
+
             <Route path="/admin-profile" element={<Profile />} />
 
           </Route>
@@ -62,6 +66,8 @@ export default function App() {
           {/* Teacher Side */}
           <Route element={<TeacherLayout />} >
           <Route path="/teacher-dashboard" element={<TeacherProfile />} />
+          <Route path="/take-attendance" element={<AttendanceForm />} />
+          <Route path="/view-attendance" element={<ViewAttendance />} />
           </Route>
 
           <Route path="/" element={<PrivateRouter />} />

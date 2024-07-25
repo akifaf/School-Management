@@ -155,18 +155,30 @@ export const editSubject = createAsyncThunk('subject/edit', async ({ id, subject
   }
 });
 
-export const updateTeacher = createAsyncThunk(
-  'teacher/updateTeacher',
-  async ({ id, teacherData }, { rejectWithValue }) => {
-    try {
-      console.log(teacherData);
-      const response = await axiosFormInstance.patch(`teacher-update/${id}/`, teacherData);
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response.data);
+export const updateTeacher = async ({ id, teacherData }) => {
+  try {
+    const response = await axiosInstance.patch(`teacher-update/${id}/`, teacherData);
+    return response.data
+  } catch (error) {
+    console.log('asdkfye');
+    return {
+      error: error.response ? error.response.data : 'Somethfasdfing went wrong'
     }
   }
-);
+}
+
+// export const updateTeacher = createAsyncThunk(
+//   'teacher/updateTeacher',
+//   async ({ id, teacherData }, { rejectWithValue }) => {
+//     try {
+//       console.log(teacherData.subject);
+//       const response = await axiosFormInstance.patch(`teacher-update/${id}/`, teacherData);
+//       return response.data;
+//     } catch (error) {
+//       return rejectWithValue(error.response.data);
+//     }
+//   }
+// );
 
 export const uploadFiles = createAsyncThunk(
   'teacher/uploadFiles',

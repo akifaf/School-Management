@@ -40,7 +40,6 @@ function StudentProfile() {
   
       try {
         const response = await updateStudentProfile(user.id, formData); 
-        console.log('respsssssssss', response);
         if (response.error) {
           console.log(response.error)
           toast.error("Failed to upload profile picture.");

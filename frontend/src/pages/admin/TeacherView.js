@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Multiselect from "multiselect-react-dropdown";
 import { MultiSelect } from "primereact/multiselect";
 
-import { blockUser, teacherList, unblockUser, updateTeacher } from "../../axios/admin/AdminServers";
+import { blockUser, subjectList, teacherList, unblockUser, updateTeacher } from "../../axios/admin/AdminServers";
 import { Link } from "react-router-dom";
 import { Toaster, toast } from "sonner";
 import { axiosInstance } from "../../axios/AxiosInstance";
@@ -17,7 +17,8 @@ function TeacherView() {
   const [editingUser, setEditingUser] = useState(null);
   const [subjects, setSubjects] = useState([]);
 
-  // const [subject, setSubject] = useState([])
+  const subject_list = useSelector((state) => state.subject.subject_list);
+  const subjectStatus = useSelector((state) => state.subject.status);
 
   const [formData, setFormData] = useState({
     first_name: "",
@@ -46,10 +47,18 @@ function TeacherView() {
   };
 
   const handleChange = (e) => {
+    const { name, value, type, options } = e.target;
+
+    if (type == 'select-multiple' && name === 'subject') {
+      const selectedOptions = Array.from(options).filter(option => option.selected).map(option => option.value);
+      setFormData({
+        ...formData,
+        [name]: selectedOptions
+      });
+    } else {      
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    }
   };
-
-
 
   useEffect(() => {
     axiosInstance
@@ -58,16 +67,14 @@ function TeacherView() {
       .catch((error) => console.error("Error fetching Subjects:", error));
   }, []);
 
+  useEffect(() => {
+    if (!subject_list && subjectStatus !== 'loading') {
+      dispatch(subjectList());
+    }
+  }, [dispatch, subject_list, subjectStatus])
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(editingUser.id, editingUser.id);
-
-    const formDataToSend = new FormData();
-    formDataToSend.append("admission_date", formData.admission_date);
-    formDataToSend.append("roll_no", formData.roll_no);
-    formDataToSend.append("class_room", formData.class_room);
-    formDataToSend.append("phone_number", formData.phone_number);
-
     const teacherData = {
       joined_date: formData.joined_date,
       subject: formData.subject,
@@ -76,27 +83,22 @@ function TeacherView() {
       last_name: formData.last_name,
       email: formData.email,
       username: formData.first_name + " " + formData.last_name,
-      subject: formData.subject
     };
-    try {
-      console.log(teacherData, 'subjoie')
-      const response = await dispatch(
-        updateTeacher({ id: editingUser.id, teacherData: teacherData })
-      ).unwrap();
-      console.log(response);
+
+      const response = await 
+        updateTeacher({ id: editingUser.id, teacherData })
+      
       setEditingUser(null);
       if (response.error) {
-        console.log(response, "error showing");
-        toast.error(response.error);
+        if (response.error.email){
+          toast.error(response.error.email);
+        } else {
+          toast.error('Something went wrong')
+        }
       } else {
         dispatch(teacherList());
-        console.log("success");
-        toast.success("Teahcer updated Successfully");
+        toast.success("Teacher updated Successfully");
       }
-    } catch (error) {
-      // console.log(error, "errer");
-      toast.error("Something went wrong");
-    }
   };
 
   useEffect(() => {
@@ -218,9 +220,14 @@ function TeacherView() {
                         </div>
                       </div>
                     </div>
-                    <td className=" py-4">{teacher.phone_number}</td>
+                    <td className=" py-4">{ teacher.phone_number}</td>
                     <td className=" py-4">{teacher.email}</td>
-                    <td className=" py-4">{teacher.subject}</td>
+                    <td className=" py-4">
+                    
+                    {teacher.subject?.map(subject => 
+                    subject_list?.find(sub => sub.id === subject)?.subject
+                    ).join(', ')}
+                    </td>
                     <td className=" py-4">
                       {teacher.is_active ? (
                         <button
@@ -402,7 +409,21 @@ function TeacherView() {
                 onRemove={(event)=>{setSubject(event)}}
                 displayValue="subject" 
                 /> */}
-                <select className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                <select multiple
+                    className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                    id="subject"
+                    name="subject"
+                    value={formData.subject}
+                    onChange={handleChange}
+                    required
+                  >
+                   {subjects.map((subject) => (
+                      <option key={subject.id} value={subject.id}>
+                        {subject.subject}
+                      </option>
+                    ))}
+                  </select>
+                {/* <select className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                   id="subject" name="subject" 
                   value={formData.subject}
                   onChange={handleChange}  
@@ -415,7 +436,7 @@ function TeacherView() {
                         {subject.subject}
                       </option>
                     ))}
-                </select>
+                </select> */}
               </div>
             </div>
 

@@ -133,23 +133,6 @@ class StudentListUpdateView(generics.RetrieveUpdateDestroyAPIView):
     def get_object(self):
         pk = self.kwargs.get('pk')
         return get_object_or_404(Student, id=pk)
-    
-
-    # def put(self,request,*args, **kwargs):
-    #     instance = self.get_object()
-    #     data = request.data.copy()
-    #     password = data.get('password')
-    #     if password:
-    #         instance.set_password(password)
-    #         instance.save()
-    #         data.pop('password',None)
-    #     serializer = self.get_serializer(instance,data = request.data,partial = True)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data)
-    #     else:
-    #         print(serializer.errors)
-    #         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 
 class StudentList(generics.ListAPIView):
@@ -173,11 +156,12 @@ class TeacherList(generics.ListAPIView):
 
 class TeacherView(generics.RetrieveUpdateAPIView):
     serializer_class = TeacherSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get_object(self):
         pk = self.kwargs.get('pk')
         return get_object_or_404(Teacher, id=pk)
+    
     
 
 

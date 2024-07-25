@@ -5,9 +5,11 @@ import { axiosInstance } from "../../axios/AxiosInstance";
 import AdminLayout from "../../layout/AdminLayout";
 import { Toaster, toast } from "sonner";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import Swal from 'sweetalert2'
 
 const AddStudent = () => {
   let { state } = useLocation();
+  const Swal = require('sweetalert2')
   const {classRoom} = state;
   const [formData, setFormData] = useState({
     first_name: "",
@@ -68,9 +70,10 @@ const AddStudent = () => {
           toast.error("Something went wrong");
         }
       } else {
-        alert(
-          `Student registered successfully. Password reset link is sent to ${formData.email}. `
-        );
+        Swal.fire({
+          icon: "success",
+          text: `Student registered successfully. Password Set link is sent to "${formData.email}".`,
+        });
         navigate("/student-management");
       }
     } catch (error) {

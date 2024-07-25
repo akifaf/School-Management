@@ -74,7 +74,7 @@ class User(AbstractUser):
     
 
 class Teacher(User):
-    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, blank=True, null=True)
+    subject = models.ManyToManyField(Subject, blank=True)
     joined_date = models.DateField(null=True)
     profile_picture = models.ImageField(upload_to='profile_pictures/teacher', null=True, blank=True)
 
@@ -96,6 +96,9 @@ class ClassRoom(models.Model):
     class_no = models.IntegerField()
     section = models.CharField(max_length=1, null=True, blank=True)
     class_teacher = models.ForeignKey(Teacher, on_delete=models.DO_NOTHING)
+
+    class Meta:
+        ordering = ['class_no']
     
     def __str__(self):
         return f'{self.class_no} {self.section}'

@@ -16,7 +16,6 @@ const TeacherLayout = () => {
   useEffect(() => {
     if (user) {
       dispatch(fetchTeacher(user.id));
-      console.log(user);
     } else {
       console.log('no user found');
     }

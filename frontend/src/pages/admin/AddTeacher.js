@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Toaster, toast } from "sonner";
 import { subjectList, teacherRegister, uploadFiles } from "../../axios/admin/AdminServers";
 import { axiosInstance } from "../../axios/AxiosInstance";
-import axios from "axios";
 import { useDispatch } from "react-redux";
+import Swal from 'sweetalert2'
+import { useNavigate } from "react-router-dom";
 
 function AddTeacher() {
   const [formData, setFormData] = useState({
@@ -11,22 +12,36 @@ function AddTeacher() {
     last_name: "",
     email: "",
     phone_number: "",
-    subject: "",
+    subject: [], // Change from string to array
     joined_date: "",
   });
 
+  const Swal = require('sweetalert2')
+  const navigate = useNavigate();
   const [subjects, setSubjects] = useState([]);
   const [files, setFiles] = useState([]);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [teacherId, setTeacherId] = useState(null);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    const { name, value, type, options } = e.target;
+
+    if (type === 'select-multiple' && name === 'subject') {
+      // Handle multiple select input
+      const selectedOptions = Array.from(options)
+        .filter(option => option.selected)
+        .map(option => option.value);
+      setFormData({
+        ...formData,
+        [name]: selectedOptions,
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
   };
 
   const handleFileChange = (e) => {
@@ -54,10 +69,14 @@ function AddTeacher() {
       }
     } else {
       setTeacherId(teacherResponse.id);
-      toast.success(`Teacher registered successfully. Password reset link is sent to ${formData.email}.`);
-
+      
+      Swal.fire({
+        icon: "success",
+        text: `Teacher registered successfully. Password reset link is sent to "${formData.email}".`,
+      });
+      navigate('/teacher-management')
+      
       // file submit if present
-      console.log(files, 'files');
       if (files.length > 0) {
         const fileFormData = new FormData();
         fileFormData.append("teacher_id", teacherResponse.id);
@@ -65,17 +84,9 @@ function AddTeacher() {
           fileFormData.append("files", files[i]);
         }
         try {
-        const fileResponse = await dispatch(uploadFiles(fileFormData))
-        console.log(fileFormData);
-          // const fileResponse = await axios.post("http://localhost:8000/api/upload_teacher_files/", fileFormData, {
-          //   headers: {
-          //     "Content-Type": "multipart/form-data",
-          //   },
-          // });
+          const fileResponse = await dispatch(uploadFiles(fileFormData));
           toast.success("Files uploaded successfully!");
           setUploadedFiles(fileResponse.data);
-          console.log(fileResponse.data);
-          console.log(uploadedFiles)
         } catch (error) {
           toast.error("Failed to upload files.");
           console.error(error);
@@ -98,7 +109,7 @@ function AddTeacher() {
         <div className="col-span-12 sm:col-span-7 flex flex-col gap-9">
           <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
             <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
-              <h3 className="font-medium text-black dark:text-white">Contact Form</h3>
+              <h3 className="font-medium text-black dark:text-white">Teacher Registration Form</h3>
             </div>
             <form onSubmit={handleSubmit}>
               <div className="p-6.5">
@@ -109,7 +120,6 @@ function AddTeacher() {
                       type="text"
                       placeholder="Enter first name"
                       className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                      id="first_name"
                       name="first_name"
                       value={formData.first_name}
                       onChange={handleChange}
@@ -156,6 +166,7 @@ function AddTeacher() {
                 <div className="mb-4.5">
                   <label className="mb-2.5 block text-black dark:text-white">Subject</label>
                   <select
+                    multiple
                     className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                     id="subject"
                     name="subject"
@@ -163,7 +174,7 @@ function AddTeacher() {
                     onChange={handleChange}
                     required
                   >
-                    <option value="">-------------</option>
+                    {/* <option value="">-------------</option> */}
                     {subjects.map((subject) => (
                       <option key={subject.id} value={subject.id}>
                         {subject.subject}
@@ -183,15 +194,6 @@ function AddTeacher() {
                     required
                   />
                 </div>
-                {/* <div className="mb-4.5">
-                  <label className="mb-2.5 block text-black dark:text-white">Attach file</label>
-                  <input
-                    type="file"
-                    multiple
-                    onChange={handleFileChange}
-                    className="w-full cursor-pointer rounded-lg border-[1.5px] border-stroke bg-transparent outline-none transition file:mr-5 file:border-collapse file:cursor-pointer file:border-0 file:border-r file:border-solid file:border-stroke file:bg-whiter file:py-3 file:px-5 file:hover:bg-primary file:hover:bg-opacity-10 focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-form-strokedark dark:file:bg-white/30 dark:file:text-white dark:focus:border-primary"
-                  />
-                </div> */}
                 <button type="submit" className="flex m-4 justify-center rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90">
                   Add Teacher
                 </button>
@@ -205,16 +207,16 @@ function AddTeacher() {
               <h3 className="font-medium text-black dark:text-white">Uploaded Files</h3>
             </div>
             <div className="flex flex-col gap-5.5 p-6.5">
-            
-            <div className="mb-4.5">
-                  <label className="mb-2.5 block text-black dark:text-white">Attach file</label>
-                  <input
-                    type="file"
-                    multiple
-                    onChange={handleFileChange}
-                    className="w-full cursor-pointer rounded-lg border-[1.5px] border-stroke bg-transparent outline-none transition file:mr-5 file:border-collapse file:cursor-pointer file:border-0 file:border-r file:border-solid file:border-stroke file:bg-whiter file:py-3 file:px-5 file:hover:bg-primary file:hover:bg-opacity-10 focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-form-strokedark dark:file:bg-white/30 dark:file:text-white dark:focus:border-primary"
-                  />
-                </div>
+              <div className="mb-4.5">
+                <label className="mb-2.5 block text-black dark:text-white">Attach file</label>
+                <input
+                  type="file"
+                  multiple
+                  onChange={handleFileChange}
+                  className="w-full cursor-pointer rounded-lg border-[1.5px] border-stroke bg-transparent outline-none transition file:mr-5 file:border-collapse file:cursor-pointer file:border-0 file:border-r file:border-solid file:border-stroke file:bg-whiter file:py-3 file:px-5 file:hover:bg-primary file:hover:bg-opacity-10 focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-form-strokedark dark:file:bg-white/30 dark:file:text-white dark:focus:border-primary"
+                />
+              </div>
+              {/* Display uploaded files if any */}
               {/* <h2>Uploaded Files</h2>
               <ul>
                 {uploadedFiles.map((file) => (

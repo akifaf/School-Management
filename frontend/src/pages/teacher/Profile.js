@@ -1,14 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchTeacherDetails, updateTeacher, uploadProfilePicture } from '../../axios/admin/AdminServers'; // Assuming you have an API function to fetch and update teacher details
-import defaultProfile from '../../images/user/default_profile.png';
-import { toast, Toaster } from 'sonner'; 
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchTeacherDetails,
+  updateTeacher,
+  uploadProfilePicture,
+} from "../../axios/admin/AdminServers"; // Assuming you have an API function to fetch and update teacher details
+import defaultProfile from "../../images/user/default_profile.png";
+import { toast, Toaster } from "sonner";
+import { updateTeacherProfile } from "../../axios/teacher.js/teacherServers";
 
 function TeacherDashboard() {
-  const { user } = useSelector(store => store.auth);
+  const { user } = useSelector((store) => store.auth);
   const dispatch = useDispatch();
   const [teacherDetails, setTeacherDetails] = useState(null);
-  const [profilePicture, setProfilePicture] = useState(null); 
+  const [profilePicture, setProfilePicture] = useState(null);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -25,10 +30,10 @@ function TeacherDashboard() {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      console.log(file);
       setProfilePicture(file);
     }
   };
+
 
   const handleUploadProfilePicture = async () => {
     if (profilePicture) {
@@ -36,8 +41,9 @@ function TeacherDashboard() {
       formData.append('profile_picture', profilePicture); 
   
       try {
-        const response = await dispatch(updateTeacher({ id: user.id, teacherData: formData }));
+        const response = await updateTeacherProfile(user.id, formData); 
         if (response.error) {
+          console.log(response.error)
           toast.error("Failed to upload profile picture.");
         } else {
           toast.success("Profile picture uploaded successfully.");
@@ -54,6 +60,7 @@ function TeacherDashboard() {
     }
   };
   
+
   if (!teacherDetails) {
     return <div>Loading...</div>;
   }
@@ -66,7 +73,14 @@ function TeacherDashboard() {
         <div className="px-4 pb-6 text-center">
           <div className="relative z-30 mx-auto mt-2 h-30 w-full max-w-30 rounded-full bg-white/20 p-1 backdrop-blur sm:h-44 sm:max-w-44 sm:p-3">
             <div className="relative drop-shadow-2">
-              <img src={teacherDetails.profile_picture ? teacherDetails.profile_picture : defaultProfile} alt="profile" />
+              <img
+                src={
+                  teacherDetails.profile_picture
+                    ? teacherDetails.profile_picture
+                    : defaultProfile
+                }
+                alt="profile"
+              />
               <label
                 htmlFor="profile"
                 className="absolute bottom-0 right-0 flex h-8.5 w-8.5 cursor-pointer items-center justify-center rounded-full bg-primary text-white hover:bg-opacity-90 sm:bottom-2 sm:right-2"
@@ -97,7 +111,7 @@ function TeacherDashboard() {
                   name="profile_picture"
                   id="profile"
                   className="sr-only"
-                  onChange={handleFileChange} 
+                  onChange={handleFileChange}
                 />
               </label>
             </div>
@@ -127,9 +141,7 @@ function TeacherDashboard() {
               <h4 className="font-semibold text-black dark:text-white">
                 About Me
               </h4>
-              <p className="mt-4.5">
-                {teacherDetails.bio}
-              </p>
+              <p className="mt-4.5">{teacherDetails.bio}</p>
             </div>
           </div>
         </div>

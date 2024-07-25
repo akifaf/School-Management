@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { axiosInstance } from "../AxiosInstance";
+import { axiosFormInstance, axiosInstance } from "../AxiosInstance";
 
 
 export const fetchTeacher = createAsyncThunk('teacher/fetchTeacher', async (id) => {
@@ -7,11 +7,10 @@ export const fetchTeacher = createAsyncThunk('teacher/fetchTeacher', async (id) 
     return response.data;
 });
 
-export const uploadProfilePicture = createAsyncThunk('teacher/uploadProfilePicture', async ({ id, formData }) => {
-    const response = await axiosInstance.put(`/teachers/${id}/upload-profile-picture/`, formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data'
-        }
-    });
-    return response.data;
-});
+export const updateTeacherProfile = async (id, teacherData) => {
+      const response = await axiosFormInstance.patch(`teacher-update/${id}/`, teacherData);
+      console.log(response);
+      return response;
+  
+  };
+

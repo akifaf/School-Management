@@ -105,28 +105,30 @@ class TeacherFileSerializer(serializers.ModelSerializer):
         fields = '__all__'
         
 class TeacherSerializer(serializers.ModelSerializer):
-    
-    subject = SubjectSerializer
+    subject = serializers.PrimaryKeyRelatedField(queryset=Subject.objects.all(), many=True)
     files = TeacherFileSerializer(many=True, read_only=True)
 
     class Meta:
         model = Teacher
         fields = ['id', 'username', 'email', 'password', 'first_name', 'last_name', 'date_of_birth', 'address', 'phone_number', 'profile_picture', 'is_student', 'is_teacher', 'is_admin', 'is_active', 'joined_date', 'subject', 'files']
+        extra_kwargs = {'password': {'write_only': True}}
 
-    
     def create(self, validated_data):
+        subject_data = validated_data.pop('subject')
         teacher = Teacher.objects.create(**validated_data)
-        
         if 'password' in validated_data:
             teacher.set_password(validated_data['password'])
         teacher.is_teacher = True
         teacher.save()
-        
-        return teacher 
-  
+        teacher.subject.set(subject_data)
+        return teacher
+
     def update(self, instance, validated_data):
+        subject_data = validated_data.pop('subject', None)
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
+        print(validated_data)
+        if subject_data is not None:
+            instance.subject.set(subject_data)
         instance.save()
-
         return instance
