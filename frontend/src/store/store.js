@@ -8,6 +8,7 @@ import classroomReducer from '../redux/ClassSlice';
 import storage from 'redux-persist/lib/storage';
 import teacherDetailReducer from '../redux/TeacherDetailSlice';
 import studentDetailReducer from '../redux/StudentDetailSlice';
+import attendanceReducer from '../redux/AttendanceSlice'
 import {persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER, } from 'redux-persist'
 
 const persistConfig = {
@@ -24,6 +25,7 @@ const rootReducer = {
   teacher: teacherReducer,
   teacherDetail: teacherDetailReducer,
   studentDetail: studentDetailReducer,
+  attendance: attendanceReducer,
 };
 
 const store = configureStore({

@@ -46,21 +46,6 @@ const AttendanceForm = () => {
       setStudents(responses.payload);
       console.log(students);
     }
-    // axiosAttendanceInstance
-    //   .get(`${selectedClassroom.id}/${selectedDate}/`)
-    //   .then((response) => {
-    //     setStudents(response.data.students);
-    //     console.log(response.data);
-    //     const initialAttendance = response.data.students.reduce(
-    //       (acc, student) => {
-    //         acc[student.id] = false;
-    //         return acc;
-    //       },
-    //       {}
-    //     );
-    //     setAttendance(initialAttendance);
-    //   })
-    //   .catch((error) => console.error("Error fetching students:", error));
   };
 
   const handleClassClick = (classItem) => {

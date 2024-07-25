@@ -41,3 +41,14 @@ class ViewAttendance(APIView):
             attendance.present = record['present']
             attendance.save()
         return Response(status=status.HTTP_200_OK)
+
+
+class StudentAttendanceView(APIView):
+    def get(self, request, student_id, date=None):
+        if date:
+            attendance_records = Attendance.objects.filter(student_id=student_id, date=date)
+        else:
+            attendance_records = Attendance.objects.filter(student_id=student_id)
+        
+        serializer = AttendanceSerializer(attendance_records, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
