@@ -61,11 +61,13 @@ function StudentView({ classRoom }) {
     formDataToSend.append("first_name", formData.first_name);
     formDataToSend.append("last_name", formData.last_name);
     formDataToSend.append("email", formData.email);
-    formDataToSend.append("username", formData.username);
+    formDataToSend.append("username", formData.first_name + ' ' + formData.last_name);
     formDataToSend.append("admission_date", formData.admission_date);
     formDataToSend.append("roll_no", formData.roll_no);
     formDataToSend.append("class_room", formData.class_room);
     formDataToSend.append("phone_number", formData.phone_number);
+    formDataToSend.append("parent_contact", formData.parent_contact);
+    formDataToSend.append("date_of_birth", formData.date_of_birth);
 
     try {
       const response = await dispatch(

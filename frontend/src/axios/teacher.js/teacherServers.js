@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { axiosFormInstance, axiosInstance } from "../AxiosInstance";
+import { axiosAttendanceInstance, axiosFormInstance, axiosInstance } from "../AxiosInstance";
 
 
 export const fetchTeacher = createAsyncThunk('teacher/fetchTeacher', async (id) => {
@@ -14,3 +14,18 @@ export const updateTeacherProfile = async (id, teacherData) => {
   
   };
 
+// export const take_attendance = async (attendanceData) => {
+//     const response = await axiosAttendanceInstance.post(`take_attendance/`, attendanceData);
+//     return response
+// }
+
+export const take_attendance = async (attendanceData) => {
+    try {
+      const response = await axiosAttendanceInstance.post('take_attendance/', attendanceData);
+      return response.data;
+    } catch (error) {
+      return {
+        error: error.response ? error.response.data : 'Something went wrong'
+      };
+    }
+  };

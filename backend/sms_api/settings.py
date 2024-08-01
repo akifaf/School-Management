@@ -41,6 +41,7 @@ INSTALLED_APPS = [
 
     'main',
     'attendance',
+    'result',
     
     'rest_framework',
     'rest_framework_simplejwt',

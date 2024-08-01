@@ -7,8 +7,5 @@ class Attendance(models.Model):
     date = models.DateField(default=date.today)
     present = models.BooleanField(default=False)
 
-    class Meta:
-        unique_together = ('student', 'date')
-
     def __str__(self):
         return f"{self.student} - {self.date} - {'Present' if self.present else 'Absent'}"

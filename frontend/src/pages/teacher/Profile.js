@@ -1,31 +1,52 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  fetchTeacherDetails,
+import {  
   updateTeacher,
   uploadProfilePicture,
+  fetchTeacherDetails,
+  subjectList,
 } from "../../axios/admin/AdminServers"; // Assuming you have an API function to fetch and update teacher details
 import defaultProfile from "../../images/user/default_profile.png";
 import { toast, Toaster } from "sonner";
 import { updateTeacherProfile } from "../../axios/teacher.js/teacherServers";
+import { fetchTeacherFiles } from "../../redux/fileSlice";
 
 function TeacherDashboard() {
   const { user } = useSelector((store) => store.auth);
+  const { teacherFiles, status: fileStatus } = useSelector((store) => store.files);
   const dispatch = useDispatch();
   const [teacherDetails, setTeacherDetails] = useState(null);
   const [profilePicture, setProfilePicture] = useState(null);
+  const subjects = useSelector((state) => state.subject.subject_list);
 
   useEffect(() => {
     const fetchDetails = async () => {
       try {
+        await dispatch(subjectList());
         const details = await dispatch(fetchTeacherDetails(user.id));
         setTeacherDetails(details.payload);
       } catch (error) {
         console.log("Error fetching teacher details: ", error);
       }
     };
+
+    const fetchFiles = async () => {
+      try {
+        await dispatch(fetchTeacherFiles());
+      } catch (error) {
+        console.log("Error fetching teacher files: ", error);
+      }
+    };
+
     fetchDetails();
+    fetchFiles();
   }, [dispatch, user.id]);
+
+  const getSubjectDetails = (id) => {
+    const subject = subjects?.find((s) => s.id === id);
+    console.log(subjects);
+    return subject ? subject.subject : "Unknown";
+  };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -34,20 +55,19 @@ function TeacherDashboard() {
     }
   };
 
-
   const handleUploadProfilePicture = async () => {
     if (profilePicture) {
       const formData = new FormData();
-      formData.append('profile_picture', profilePicture); 
-  
+      formData.append("profile_picture", profilePicture);
+
       try {
-        const response = await updateTeacherProfile(user.id, formData); 
+        const response = await updateTeacherProfile(user.id, formData);
         if (response.error) {
-          console.log(response.error)
+          console.log(response.error);
           toast.error("Failed to upload profile picture.");
         } else {
           toast.success("Profile picture uploaded successfully.");
-          
+
           const updatedDetails = await dispatch(fetchTeacherDetails(user.id));
           setTeacherDetails(updatedDetails.payload);
         }
@@ -59,7 +79,6 @@ function TeacherDashboard() {
       toast.error("Please select a profile picture to upload.");
     }
   };
-  
 
   if (!teacherDetails) {
     return <div>Loading...</div>;
@@ -102,57 +121,54 @@ function TeacherDashboard() {
                   <path
                     fillRule="evenodd"
                     clipRule="evenodd"
-                    d="M7.00004 5.83329C6.03354 5.83329 5.25004 6.61679 5.25004 7.58329C5.25004 8.54979 6.03354 9.33329 7.00004 9.33329C7.96654 9.33329 8.75004 8.54979 8.75004 7.58329C8.75004 6.61679 7.96654 5.83329 7.00004 5.83329ZM4.08337 7.58329C4.08337 5.97246 5.38921 4.66663 7.00004 4.66663C8.61087 4.66663 9.91671 5.97246 9.91671 7.58329C9.91671 9.19412 8.61087 10.5 7.00004 10.5C5.38921 10.5 4.08337 9.19412 4.08337 7.58329Z"
+                    d="M7.00004 5.83337C6.46776 5.83337 5.95659 6.04382 5.58152 6.41889C5.20645 6.79395 4.996 7.30513 4.996 7.83741C4.996 8.36969 5.20645 8.88086 5.58152 9.25593C5.95659 9.63099 6.46776 9.84145 7.00004 9.84145C7.53232 9.84145 8.04349 9.63099 8.41856 9.25593C8.79363 8.88086 9.00408 8.36969 9.00408 7.83741C9.00408 7.30513 8.79363 6.79395 8.41856 6.41889C8.04349 6.04382 7.53232 5.83337 7.00004 5.83337ZM5.74789 5.2521C6.19492 4.80508 6.78783 4.55574 7.40417 4.55574C8.02051 4.55574 8.61342 4.80508 9.06045 5.2521C9.50747 5.69913 9.75682 6.29204 9.75682 6.90838C9.75682 7.52473 9.50747 8.11763 9.06045 8.56466C8.61342 9.01169 8.02051 9.26104 7.40417 9.26104C6.78783 9.26104 6.19492 9.01169 5.74789 8.56466C5.30087 8.11763 5.05153 7.52473 5.05153 6.90838C5.05153 6.29204 5.30087 5.69913 5.74789 5.2521Z"
                     fill=""
                   />
                 </svg>
                 <input
-                  type="file"
-                  name="profile_picture"
                   id="profile"
-                  className="sr-only"
+                  type="file"
+                  className="hidden"
                   onChange={handleFileChange}
                 />
               </label>
             </div>
           </div>
-          <div className="mt-4">
-            <h3 className="mb-1.5 text-2xl font-semibold text-black dark:text-white">
+          <div className="">
+            <h3 className="text-black dark:text-white text-2xl font-medium">
               {teacherDetails.username}
             </h3>
-            <p className="font-medium">{teacherDetails.email}</p>
+            <p> {teacherDetails.email}</p>
+            <span className="text-sm font-medium">{user.role}</span>
+          </div>
 
-            <div className="mx-auto mt-4.5 mb-5.5 grid max-w-94 grid-cols-3 rounded-md border border-stroke py-2.5 shadow-1 dark:border-strokedark dark:bg-[#37404F]">
-              <div className="flex flex-col items-center justify-center gap-1 border-r border-stroke px-4 dark:border-strokedark xsm:flex-row">
-                <span className="font-semibold text-black dark:text-white">
-                  {teacherDetails.subject}
-                </span>
-                <span className="text-sm">Subject</span>
-              </div>
-              <div className="flex flex-col items-center justify-center gap-1 border-r border-stroke px-4 dark:border-strokedark xsm:flex-row">
-                <span className="font-semibold text-black dark:text-white">
-                  Joined: {teacherDetails.joined_date}
-                </span>
-                <span className="text-sm">Joined Date</span>
-              </div>
-            </div>
-
-            <div className="mx-auto max-w-180">
-              <h4 className="font-semibold text-black dark:text-white">
-                About Me
-              </h4>
-              <p className="mt-4.5">{teacherDetails.bio}</p>
-            </div>
+          <button
+            className="mt-4 inline-flex items-center justify-center rounded-md bg-primary py-2 px-4 font-semibold text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
+            onClick={handleUploadProfilePicture}
+          >
+            Upload Profile Picture
+          </button>
+                {/* <h2>{getSubjectDetails(teacherDetails.subject)}</h2> */}
+          {/* Display teacher's files */}
+          
+          <div className="mt-6">
+            <h4 className="text-lg font-medium">Certificates</h4>
+            {fileStatus === 'loading' && <p>Loading files...</p>}
+            {fileStatus === 'succeeded' && (
+              <ul>
+                {teacherFiles.map((file) => (
+                  <li key={file.id}>
+                    <a href={file.file} target="_blank" rel="noopener noreferrer">
+                      preview 22
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {fileStatus === 'failed' && <p>Failed to load files.</p>}
           </div>
         </div>
       </div>
-
-      <button
-        className="mt-4 bg-primary hover:bg-opacity-90 text-white font-semibold py-2 px-8 rounded-md"
-        onClick={handleUploadProfilePicture} // Handle profile picture upload
-      >
-        Upload Profile Picture
-      </button>
     </div>
   );
 }

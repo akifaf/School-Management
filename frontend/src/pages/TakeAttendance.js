@@ -5,6 +5,7 @@ import flatpickr from "flatpickr";
 import { studentListByClass } from "../axios/admin/AdminServers";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { take_attendance } from "../axios/teacher.js/teacherServers";
 
 const AttendanceForm = () => {
   const [classrooms, setClassrooms] = useState([]);
@@ -27,6 +28,7 @@ const AttendanceForm = () => {
     flatpickr(datepickerRef.current, {
       mode: "single",
       dateFormat: "Y-m-d",
+      maxDate: "today",
       onChange: (selectedDates, dateStr) => {
         setSelectedDate(dateStr);
       },
@@ -52,7 +54,7 @@ const AttendanceForm = () => {
     setSelectedClassroom(classItem);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const attendanceData = students.map((student) => ({
       student: student.id,
@@ -60,20 +62,21 @@ const AttendanceForm = () => {
       present: attendance[student.id],
     }));
     console.log(attendanceData);
-    axiosAttendanceInstance
-      .post("/take_attendance/", attendanceData)
-      .then((response) => {
-        console.log("Attendance saved:", response.data);
+    const response = await take_attendance(attendanceData)
+    console.log(response);
+    if (response.error) {
+      console.log(response.error[0]['unique']);
+        toast.error(response.error[0]['unique'])
+        setStudents([])
+        // navigate("/view-attendance");
+      } else {
         toast.success("Attendance saved successfully");
-        navigate("/view-attendance");
-      })
-      .catch((error) => {
-        console.error("Error saving attendance:", error);
-        toast.error("Error saving attendance");
-      });
+        setStudents([])
+    }
   };
 
   return (
+    
     <div className="p-4">
       <h1 className="text-3xl text-gray-900 pb-4 font-bold">Mark Attendance</h1>
       <Toaster position="top-center" richColors />

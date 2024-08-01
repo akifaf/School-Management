@@ -83,7 +83,7 @@ class Teacher(User):
         verbose_name_plural = "Teachers"
 
     def __str__(self):
-        return self.email
+        return self.username
 
 
 class TeacherFile(models.Model):
@@ -110,13 +110,17 @@ class ClassRoom(models.Model):
         if ClassRoom.objects.filter(class_no=self.class_no, section=self.section).exclude(id=self.id).exists():
             raise ValidationError(f"ClassRoom with class_no {self.class_no} and section {self.section} already exists.")
 
-
     def is_full(self):
-        MAX_STUDENTS_PER_CLASS = 3
+        MAX_STUDENTS_PER_CLASS = 30
         return self.student_set.count() >= MAX_STUDENTS_PER_CLASS
+    
+    def class_strength(self):
+        return self.student_set.count()
+    
+    def syllabus_count(self):
+        return self.syllabus_set.count()
 
 class Student(User):
-    # user = models.OneToOneField(User, on_delete=models.CASCADE)
     roll_no = models.IntegerField(unique=True)
     class_room = models.ForeignKey(ClassRoom, on_delete=models.DO_NOTHING)
     admission_date = models.DateField()
@@ -126,6 +130,8 @@ class Student(User):
     class Meta:
         verbose_name = "Student"
         verbose_name_plural = "Students"
+        
+        ordering = ['roll_no']
     
     def __str__(self):
         return self.username

@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import defaultProfile from '../../images/user/default_profile.png';
 import { useDispatch, useSelector } from 'react-redux';
-import {  updateStudent, uploadProfilePicture } from '../../axios/admin/AdminServers'; // Assuming you have an API function to upload profile picture
 import { toast, Toaster } from 'sonner'; // Assuming you have a toast notification component
 import { fetchStudentDetails } from '../../redux/StudentDetailSlice';
 import { updateStudentProfile } from '../../axios/student/StudentServers';
+import defaultProfile from '../../images/user/default_profile.png';
 
 function StudentProfile() {
   const { user } = useSelector(store => store.auth);
   const dispatch = useDispatch();
   const [studentDetails, setStudentDetails] = useState(null);
-  const [profilePicture, setProfilePicture] = useState(null); // State to hold profile picture file
+  const [profilePicture, setProfilePicture] = useState(null);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -36,16 +34,15 @@ function StudentProfile() {
   const handleUploadProfilePicture = async () => {
     if (profilePicture) {
       const formData = new FormData();
-      formData.append('profile_picture', profilePicture); 
-  
+      formData.append('profile_picture', profilePicture);
+
       try {
-        const response = await updateStudentProfile(user.id, formData); 
+        const response = await updateStudentProfile(user.id, formData);
         if (response.error) {
-          console.log(response.error)
+          console.log(response.error);
           toast.error("Failed to upload profile picture.");
         } else {
           toast.success("Profile picture uploaded successfully.");
-          
           const updatedDetails = await dispatch(fetchStudentDetails(user.id));
           setStudentDetails(updatedDetails.payload);
         }
@@ -57,21 +54,20 @@ function StudentProfile() {
       toast.error("Please select a profile picture to upload.");
     }
   };
-  
 
   if (!studentDetails) {
     return <div>Loading...</div>;
   }
 
   return (
-    <div>
+    <div className="p-4">
       <Toaster position="top-center" richColors />
 
       <div className="overflow-hidden rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-        <div className="px-4 pb-6 text-center">
-          <div className="relative z-30 mx-auto mt-2 h-30 w-full max-w-30 rounded-full bg-white/20 p-1 backdrop-blur sm:h-44 sm:max-w-44 sm:p-3">
+        <div className="px-4 text-center">
+          <div className="relative z-30 mx-auto mt-2 h-30 w-full max-w-30 bg-white/20 p-1 backdrop-blur sm:h-44 sm:max-w-44 sm:p-3">
             <div className="relative drop-shadow-2">
-              <img src={studentDetails.profile_picture ? studentDetails.profile_picture : defaultProfile} alt="profile" />
+              <img src={studentDetails.profile_picture ? studentDetails.profile_picture : defaultProfile} alt="profile" className="rounded w-full h-full object-cover" />
               <label
                 htmlFor="profile"
                 className="absolute bottom-0 right-0 flex h-8.5 w-8.5 cursor-pointer items-center justify-center rounded-full bg-primary text-white hover:bg-opacity-90 sm:bottom-2 sm:right-2"
@@ -102,55 +98,40 @@ function StudentProfile() {
                   name="profile_picture"
                   id="profile"
                   className="sr-only"
-                  onChange={handleFileChange} 
+                  onChange={handleFileChange}
                 />
               </label>
             </div>
+            
           </div>
-          <div className="mt-4">
+          
+          <div className="">
             <h3 className="mb-1.5 text-2xl font-semibold text-black dark:text-white">
-              {studentDetails.username}
+              {studentDetails.first_name} {studentDetails.last_name}
             </h3>
             <p className="font-medium">{studentDetails.email}</p>
-            <div className="mx-auto mt-4.5 mb-5.5 grid max-w-94 grid-cols-3 rounded-md border border-stroke py-2.5 shadow-1 dark:border-strokedark dark:bg-[#37404F]">
-              <div className="flex flex-col items-center justify-center gap-1 border-r border-stroke px-4 dark:border-strokedark xsm:flex-row">
-                <span className="font-semibold text-black dark:text-white">
-                  {studentDetails.posts}
-                </span>
-                <span className="text-sm">Posts</span>
-              </div>
-              <div className="flex flex-col items-center justify-center gap-1 border-r border-stroke px-4 dark:border-strokedark xsm:flex-row">
-                <span className="font-semibold text-black dark:text-white">
-                  {studentDetails.followers}
-                </span>
-                <span className="text-sm">Followers</span>
-              </div>
-              <div className="flex flex-col items-center justify-center gap-1 px-4 xsm:flex-row">
-                <span className="font-semibold text-black dark:text-white">
-                  {studentDetails.following}
-                </span>
-                <span className="text-sm">Following</span>
-              </div>
-            </div>
-
-            <div className="mx-auto max-w-180">
-              <h4 className="font-semibold text-black dark:text-white">
-                About Me
-              </h4>
-              <p className="mt-4.5">
-                {studentDetails.classroom}
-              </p>
-            </div>
+            {/* <p className="font-medium">{studentDetails.phone_number}</p> */}
           </div>
-        </div>
-      </div>
-
+          
+          <div className="m-4">
+            {/* <h4 className="text-xl font-semibold">Student Details</h4> */}
+            <p><strong>Roll No:</strong> {studentDetails.roll_no}</p>
+            <p><strong>Admission Date:</strong> {studentDetails.admission_date}</p>
+            {/* <p><strong>Classroom:</strong> {studentDetails.class_room}</p> */}
+            <p><strong>Parent Contact:</strong> {studentDetails.parent_contact}</p>
+            {/* <p><strong>Username:</strong> {studentDetails.username}</p> */}
+            {/* <p><strong>Address:</strong> {studentDetails.address}</p> */}
+            <p><strong>Date of Birth:</strong> {studentDetails.date_of_birth || "N/A"}</p>
+          </div>
       <button
-        className="mt-4 bg-primary hover:bg-opacity-90 text-white font-semibold py-2 px-8 rounded-md"
-        onClick={handleUploadProfilePicture} // Handle profile picture upload
+        className="m-4 bg-primary hover:bg-opacity-90 text-white font-semibold py-2 px-8 rounded-md"
+        onClick={handleUploadProfilePicture}
       >
         Upload Profile Picture
       </button>
+        </div>
+      </div>
+
     </div>
   );
 }

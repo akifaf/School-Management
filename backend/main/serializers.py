@@ -57,7 +57,7 @@ class ClassroomSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ClassRoom
-        fields = '__all__'
+        fields = ['id', 'class_no', 'section', 'class_teacher', 'class_strength', 'syllabus_count']
 
     def validate(self, attrs):
         if self.instance: 

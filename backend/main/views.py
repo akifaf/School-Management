@@ -162,6 +162,16 @@ class TeacherView(generics.RetrieveUpdateAPIView):
         pk = self.kwargs.get('pk')
         return get_object_or_404(Teacher, id=pk)
     
+
+class TeacherFilesView(generics.ListAPIView):
+    serializer_class = TeacherFileSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_teacher:
+            return TeacherFile.objects.filter(teacher=user)
+        return TeacherFile.objects.none()
     
 
 
@@ -220,6 +230,10 @@ class UnBlockUserView(APIView):
 class ClassRoomAPIView(generics.ListCreateAPIView):
     queryset = ClassRoom.objects.all()
     serializer_class = ClassroomSerializer
+    # classroom = ClassRoom.objects.get(class_no=1, section='A')
+    # strength = classroom.get_strength()
+    # print(f'The strength of the class {classroom} is {strength}')
+
     # permission_classes = [IsAdminUser, IsAuthenticated]
 
 

@@ -53,6 +53,9 @@ function ClassView() {
               <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
               {`Class Teacher: ${teachers ? (teachers.find(teacher => teacher.id === classItem.class_teacher)?.username) : null }`}
               </p>
+              <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
+              {`Class Strength: ${classItem.class_strength}`}
+              </p>
             </div>
           ))}
         </div>

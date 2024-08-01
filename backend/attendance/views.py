@@ -6,6 +6,8 @@ from main.models import Student, ClassRoom
 from .serializers import AttendanceSerializer
 from main.serializers import StudentSerializer
 from datetime import date
+import datetime
+
 
 class StudentListByClassAndDate(APIView):
     def get(self, request, class_id, date_str):
@@ -36,6 +38,8 @@ class ViewAttendance(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, class_id, date):
+        today = datetime.date.today()
+        print(today)
         for record in request.data:
             attendance = Attendance.objects.get(student_id=record['student'], date=date)
             attendance.present = record['present']

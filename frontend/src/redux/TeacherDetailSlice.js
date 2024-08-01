@@ -10,8 +10,6 @@ const initialState = {
     status: 'loading',
 };
 
-
-
 const TeacherDetailSlice = createSlice({
   name: 'teacherDetail',
   initialState,

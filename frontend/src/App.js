@@ -27,6 +27,9 @@ import AddClassRoom from "./pages/admin/AddClassRoom";
 import AttendanceForm from "./pages/TakeAttendance";
 import ViewAttendance from "./pages/ViewAttendance";
 import StudentAttendance from "./pages/student/StudentViewAttendance";
+import ResultForm from "./pages/teacher/Result";
+import SyllabusList from "./pages/admin/SyllabusList";
+import SyllabusView from "./pages/admin/SyllabusView";
 
 export default function App() {
   return (
@@ -54,6 +57,8 @@ export default function App() {
 
             <Route path="/attendance" element={<ViewAttendance /> }/>
 
+            <Route path="/syllabus" element={<SyllabusView />} />
+
             <Route path="/admin-profile" element={<Profile />} />
 
           </Route>
@@ -70,6 +75,7 @@ export default function App() {
           <Route path="/teacher-dashboard" element={<TeacherProfile />} />
           <Route path="/take-attendance" element={<AttendanceForm />} />
           <Route path="/view-attendance" element={<ViewAttendance />} />
+          <Route path="/result" element={<ResultForm />} />
           </Route>
 
           <Route path="/" element={<PrivateRouter />} />
