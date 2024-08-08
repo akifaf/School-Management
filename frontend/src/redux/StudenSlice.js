@@ -27,14 +27,6 @@ const studentSlice = createSlice({
               state.loading = false;
               state.error = action.payload;
             })
-            // .addCase(studentList.fulfilled, (state, action) => {
-            //     state.student_list = action.payload;
-            //     state.status = 'successful';
-            // })
-            // .addCase(studentList.rejected, (state, action) => {
-            //     state.error = action.error.message;
-            //     state.status = 'failed';
-            // })
             .addCase(updateStudent.pending, (state) => {
                 state.status = 'loading';
             })

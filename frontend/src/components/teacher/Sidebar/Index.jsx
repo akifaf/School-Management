@@ -213,9 +213,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
               {/* <!-- Menu Item Teacher --> */}
               <li>
                 <NavLink
-                  to="#"
+                  to="add-result/"
                   className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                    pathname.includes("view-result") && "bg-graydark dark:bg-meta-4"
+                    pathname.includes("add-result") && "bg-graydark dark:bg-meta-4"
                   }`}
                 >
                   <svg
@@ -231,7 +231,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                       fill=""
                     />
                   </svg>
-                  View result
+                  Add result
                 </NavLink>
               </li>
               {/* <!-- Menu Item Teacher --> */}

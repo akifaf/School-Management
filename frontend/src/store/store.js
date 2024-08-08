@@ -1,19 +1,30 @@
 // store.js
-import { configureStore } from '@reduxjs/toolkit';
-import authReducer from '../redux/AuthSlice';
-import studentReducer from '../redux/StudenSlice';
-import subjectReducer from '../redux/SubjectSlice';
-import teacherReducer from '../redux/TeacherSlice';
-import classroomReducer from '../redux/ClassSlice';
-import storage from 'redux-persist/lib/storage';
-import teacherDetailReducer from '../redux/TeacherDetailSlice';
-import studentDetailReducer from '../redux/StudentDetailSlice';
-import attendanceReducer from '../redux/AttendanceSlice';
-import filesReducer from '../redux/fileSlice';
-import {persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER, } from 'redux-persist'
+import { configureStore } from "@reduxjs/toolkit";
+import authReducer from "../redux/AuthSlice";
+import studentReducer from "../redux/StudenSlice";
+import subjectReducer from "../redux/SubjectSlice";
+import teacherReducer from "../redux/TeacherSlice";
+import classroomReducer from "../redux/ClassSlice";
+import syllabusReducer from "../redux/SyllabusSlice";
+import storage from "redux-persist/lib/storage";
+import teacherDetailReducer from "../redux/TeacherDetailSlice";
+import studentDetailReducer from "../redux/StudentDetailSlice";
+import attendanceReducer from "../redux/AttendanceSlice";
+import filesReducer from "../redux/fileSlice";
+import examTypeReducer from "../redux/ExamTypeSlice";
+import {
+  persistStore,
+  persistReducer,
+  FLUSH,
+  REHYDRATE,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER,
+} from "redux-persist";
 
 const persistConfig = {
-  key: 'root',
+  key: "root",
   storage,
   // whitelist: ['auth'], // only persist the auth reducer
 };
@@ -28,6 +39,8 @@ const rootReducer = {
   studentDetail: studentDetailReducer,
   attendance: attendanceReducer,
   files: filesReducer,
+  examType: examTypeReducer,
+  syllabus: syllabusReducer,
 };
 
 const store = configureStore({
@@ -35,9 +48,8 @@ const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE,
-            REGISTER],
-    },
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
     }),
 });
 

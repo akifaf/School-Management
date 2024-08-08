@@ -1,9 +1,17 @@
-# urls.py
 from django.urls import path
-from .views import ResultListCreateView, ResultDetailView, SyllabusListView
+from .views import (
+    ResultCreateView, ResultListView, ResultDetailView,
+    SyllabusListView, SyllabusDetailView, SyllabusByClassroomView,
+    ExamTypeView, ExamTypeDetailView
+)
 
 urlpatterns = [
-    path('', ResultListCreateView.as_view(), name='result-list-create'),
+    path('', ResultCreateView.as_view(), name='result-list-create'),
     path('<int:pk>/', ResultDetailView.as_view(), name='result-detail'),
+    path('result_list/<int:pk>/', ResultListView.as_view(), name='result_list'),
     path('syllabus/', SyllabusListView.as_view(), name='syllabus-list'),
+    path('syllabus/<int:pk>/', SyllabusDetailView.as_view(), name='syllabus-detail'),  
+    path('syllabus_by_class/<int:id>/', SyllabusByClassroomView.as_view(), name='syllabus_by_class'),
+    path('exam_type/', ExamTypeView.as_view(), name='exam_type_list_create'),
+    path('exam_type/<int:id>/', ExamTypeDetailView.as_view(), name='exam_type_detail'),
 ]

@@ -1,19 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast, Toaster } from "sonner";
-import { classRoomList, subjectList, teacherList } from "../../axios/admin/AdminServers";
+import { classRoomList, deleteSyllabus, subjectList, teacherList } from "../../axios/admin/AdminServers";
 import { axiosInstance, axiosResultInstance } from "../../axios/AxiosInstance";
 import Modal from "../../components/Modal";
+import { fetchSyllabus } from "../../redux/SyllabusSlice";
+
 
 const SyllabusList = ({ classRoom }) => {
   const dispatch = useDispatch();
   const classrooms = useSelector((state) => state.classroom.classrooms);
   const subjects = useSelector((state) => state.subject.subject_list);
   const teachers = useSelector((state) => state.teacher.teachers_list);
+  const syllabus_list = useSelector((state) => state.syllabus.syllabus);
   const [addSyllabus, setAddSyllabus] = useState(false);
-  const [syllabus, setSyllabus] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedClassroom, setSelectedClassroom] = useState(classRoom.id); // Set initial classroom from prop
+  const [selectedClassroom, setSelectedClassroom] = useState(classRoom.id);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [syllabusToDelete, setSyllabusToDelete] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -21,8 +25,7 @@ const SyllabusList = ({ classRoom }) => {
         await dispatch(classRoomList());
         await dispatch(subjectList());
         await dispatch(teacherList());
-        const response = await axiosResultInstance.get("/syllabus/");
-        setSyllabus(response.data);
+        await dispatch(fetchSyllabus());
       } catch (error) {
         console.error("Error fetching data:", error);
         toast.error("Error fetching data: " + error.message);
@@ -51,14 +54,29 @@ const SyllabusList = ({ classRoom }) => {
 
   const handleAddSyllabusSuccess = () => {
     setAddSyllabus(false);
-    axiosResultInstance
-      .get("/syllabus/")
-      .then((response) => setSyllabus(response.data))
-      .catch((error) => toast.error("Error refreshing syllabus list: " + error.message));
+    dispatch(fetchSyllabus());
   };
 
-  // Filter the syllabus list based on the selected classroom
-  const filteredSyllabus = syllabus.filter((item) => item.classroom === selectedClassroom);
+  const confirmDelete = (id) => {
+    setSyllabusToDelete(id);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDelete = () => {
+    dispatch(deleteSyllabus(syllabusToDelete))
+      .then(() => {
+        toast.success("Syllabus deleted successfully.");
+        dispatch(fetchSyllabus());
+        setDeleteModalOpen(false);
+        setSyllabusToDelete(null);
+      })
+      .catch((error) => {
+        console.error("Error deleting syllabus:", error);
+        toast.error("Error deleting syllabus: " + error.message);
+      });
+  };
+
+  const filteredSyllabus = syllabus_list?.filter((item) => item.classroom === selectedClassroom);
 
   if (loading) return <div>Loading...</div>;
 
@@ -73,7 +91,7 @@ const SyllabusList = ({ classRoom }) => {
             onChange={(e) => setSelectedClassroom(Number(e.target.value))}
             className="border border-gray-300 rounded-lg px-3 py-1.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            {classrooms.map((classroom) => (
+            {classrooms?.map((classroom) => (
               <option key={classroom.id} value={classroom.id}>
                 {getClassroomDetails(classroom.id)}
               </option>
@@ -87,34 +105,56 @@ const SyllabusList = ({ classRoom }) => {
           </button>
         </div>
       </div>
-        <div className="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
-          <div className="max-w-full overflow-x-auto">
-            <table className="w-full table-auto">
-              <thead>
-                <tr className="bg-gray-2 text-left dark:bg-meta-4">
-                  <th className="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">Subject</th>
-                  <th className="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">Teacher</th>
+      <div className="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
+        <div className="max-w-full overflow-x-auto">
+          <table className="w-full table-auto">
+            <thead>
+              <tr className="bg-gray-2 text-left dark:bg-meta-4">
+                <th className="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">Subject</th>
+                <th className="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">Teacher</th>
+                <th className="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredSyllabus?.map((item) => (
+                <tr key={item.id}>
+                  <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                    {getSubjectDetails(item.subject)}
+                  </td>
+                  <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                    {getTeacherDetails(item.teacher)}
+                  </td>
+                  <td>
+                    <button
+                      onClick={() => confirmDelete(item.id)}
+                      type="button"
+                      className="text-red-700 border border-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 dark:border-red-500 dark:text-red-500 dark:focus:ring-red-900"
+                    >
+                      Delete
+                    </button>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {filteredSyllabus.map((item) => (
-                  <tr key={item.id}>
-                    <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                      {getSubjectDetails(item.subject)}
-                    </td>
-                    <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                      {getTeacherDetails(item.teacher)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
         </div>
-      
+      </div>
 
-      <Modal isOpen={addSyllabus} onClose={() => setAddSyllabus(false)} header='Add Sullabus'>
+      <Modal
+        isOpen={addSyllabus}
+        onClose={() => setAddSyllabus(false)}
+        header="Add Syllabus"
+      >
         <AddSyllabusForm onSuccess={handleAddSyllabusSuccess} classRoom={selectedClassroom} />
+      </Modal>
+
+      <Modal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        header="Confirm Delete"
+        onConfirm={handleDelete}
+      >
+        <p>Are you sure you want to delete this syllabus?</p>
       </Modal>
     </div>
   );
@@ -122,30 +162,22 @@ const SyllabusList = ({ classRoom }) => {
 
 
 const AddSyllabusForm = ({ onSuccess, classRoom }) => {
-  const [classrooms, setClassrooms] = useState([]);
-  const [subjects, setSubjects] = useState([]);
-  const [teachers, setTeachers] = useState([]);
+  // const [classrooms, setClassrooms] = useState([]);
+  // const [subjects, setSubjects] = useState([]);
+  // const [teachers, setTeachers] = useState([]);
   const [selectedClassroom, setSelectedClassroom] = useState(classRoom);
   const [selectedSubject, setSelectedSubject] = useState("");
   const [selectedTeacher, setSelectedTeacher] = useState("");
   const [filteredTeachers, setFilteredTeachers] = useState([]);
+  const classrooms = useSelector((state) => state.classroom.classrooms);
+  const subjects = useSelector((state) => state.subject.subject_list);
+  const teachers = useSelector((state) => state.teacher.teachers_list);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    console.log(classRoom);
-    axiosInstance
-      .get("classroom/")
-      .then((response) => setClassrooms(response.data))
-      .catch((error) => console.error("Error fetching classrooms:", error));
-
-    axiosInstance
-      .get("subject/")
-      .then((response) => setSubjects(response.data))
-      .catch((error) => console.error("Error fetching subjects:", error));
-
-    axiosInstance
-      .get("teacher/")
-      .then((response) => setTeachers(response.data))
-      .catch((error) => console.error("Error fetching teachers:", error));
+    dispatch(classRoomList());
+    dispatch(subjectList());
+    dispatch(teacherList());
   }, []);
 
   const handleSubmit = (e) => {

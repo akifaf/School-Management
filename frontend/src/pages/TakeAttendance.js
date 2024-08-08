@@ -73,6 +73,7 @@ const AttendanceForm = () => {
         toast.success("Attendance saved successfully");
         setStudents([])
     }
+    setSelectedDate("")
   };
 
   return (

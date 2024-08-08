@@ -1,11 +1,13 @@
 # serializers.py
 from rest_framework import serializers
-from .models import Result, Syllabus
+from .models import ExamType, Result, Syllabus
 
 class SyllabusSerializer(serializers.ModelSerializer):
+    get_data = serializers.CharField(source='get_dataa', read_only=True)
+
     class Meta:
         model = Syllabus
-        fields = ['id', 'classroom', 'subject', 'teacher']
+        fields = ['id', 'classroom', 'subject', 'teacher', 'get_data']
 
     def validate(self, data):
         teacher = data.get('teacher')
@@ -22,7 +24,12 @@ class SyllabusSerializer(serializers.ModelSerializer):
 
         return data
 
+class ExamTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExamType
+        fields = '__all__'
+
 class ResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = Result
-        fields = ['id', 'student', 'syllabus', 'assignment_mark', 'exam_mark', 'created_at', 'updated_at']
+        fields = '__all__'

@@ -30,6 +30,10 @@ import StudentAttendance from "./pages/student/StudentViewAttendance";
 import ResultForm from "./pages/teacher/Result";
 import SyllabusList from "./pages/admin/SyllabusList";
 import SyllabusView from "./pages/admin/SyllabusView";
+import ExamType from "./pages/admin/ExamType";
+import ResultView from "./pages/teacher/ResultView";
+import Settings from "./pages/admin/Settings";
+import AddResult from "./pages/teacher/AddResult";
 
 export default function App() {
   return (
@@ -56,8 +60,10 @@ export default function App() {
             <Route path="/add-classroom" element={<AddClassRoom />} />
 
             <Route path="/attendance" element={<ViewAttendance /> }/>
+            <Route path="/exam-type" element={<ExamType /> }/>
 
             <Route path="/syllabus" element={<SyllabusView />} />
+            <Route path='/settings' element={<ExamType />} />
 
             <Route path="/admin-profile" element={<Profile />} />
 
@@ -75,7 +81,8 @@ export default function App() {
           <Route path="/teacher-dashboard" element={<TeacherProfile />} />
           <Route path="/take-attendance" element={<AttendanceForm />} />
           <Route path="/view-attendance" element={<ViewAttendance />} />
-          <Route path="/result" element={<ResultForm />} />
+          <Route path="/add-result" element={<AddResult />} />
+          <Route path="/add" element={<ResultView />} />
           </Route>
 
           <Route path="/" element={<PrivateRouter />} />

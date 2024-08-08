@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from "../axios";
-import { axiosFormInstance, axiosInstance } from "../AxiosInstance";
+import { axiosFormInstance, axiosInstance, axiosResultInstance } from "../AxiosInstance";
 // import axios from 'axios';
 
 
@@ -135,6 +135,7 @@ export const updateStudent = createAsyncThunk(
   'student/updateStudent',
   async ({ id, studentData }, { rejectWithValue }) => {
     try {
+      console.log('stue', studentData);
       const response = await axiosFormInstance.patch(`student/${id}/`, studentData);
       return response.data;
     } catch (error) {
@@ -220,3 +221,28 @@ export const unblockUser = createAsyncThunk(
   }
 )
 
+    
+export const examTypeList = createAsyncThunk('exam_type/exam_type_list', async () => {
+  try {
+    const response = await axiosResultInstance.get('/exam_type');
+    return response.data;
+} catch (error) {
+  console.log(error);
+}
+})
+
+export const addExamType = createAsyncThunk('exam_type/add_exam_type', async (data) => {
+  const response = await axiosResultInstance.post(`/exam_type/`, JSON.stringify(data));
+  return response
+})
+
+export const deleteExamType = createAsyncThunk('exam_type/delete', async (id) => {
+  await axiosResultInstance.delete(`/exam_type/${id}/`);
+  return id;
+});
+
+export const deleteSyllabus = createAsyncThunk('syllabus/delete_syllabus', async (id) => {
+  const response = await axiosResultInstance.delete(`/syllabus/${id}/`);
+  return response
+}
+)
