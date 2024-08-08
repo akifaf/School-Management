@@ -55,5 +55,5 @@ export const addSubject = createAsyncThunk('subject/add_subject', async (data) =
 
 export const addResult = createAsyncThunk('result/add_result', async (data) => {
   const response = await axiosResultInstance.post(`/`, JSON.stringify(data));
-return response
+return response.data
 })

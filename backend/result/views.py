@@ -10,6 +10,7 @@ from main.serializers import ClassroomSerializer
 from main.models import ClassRoom, Student
 from rest_framework.permissions import IsAdminUser
 from .serializers import ExamTypeSerializer
+from django.db import IntegrityError
 
 
 from rest_framework import generics
@@ -26,8 +27,14 @@ class ResultCreateView(generics.ListCreateAPIView):
         data = request.data
         serializer = ResultSerializer(data=data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            try:
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            except IntegrityError:
+                return Response(
+                    {"error": "A result for this student, syllabus, and exam type already exists."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ResultDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -67,12 +74,12 @@ class TeacherClassListView(generics.ListAPIView):
     
 class ExamTypeView(generics.ListCreateAPIView):
     queryset = ExamType.objects.all()
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAuthenticated]
     serializer_class = ExamTypeSerializer
 
 class ExamTypeDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = ExamType.objects.all()
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAuthenticated]
     serializer_class = ExamTypeSerializer
 
 class SyllabusByClassroomView(generics.ListAPIView):

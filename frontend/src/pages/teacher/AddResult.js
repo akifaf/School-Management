@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { toast, Toaster } from "sonner";
 import flatpickr from "flatpickr";
 import { useDispatch, useSelector } from "react-redux";
-import { classRoomList, studentListByClass } from "../../axios/admin/AdminServers";
+import { classRoomList, examTypeList, studentListByClass } from "../../axios/admin/AdminServers";
 import { addResult, syllabusByClass } from "../../axios/teacher.js/teacherServers";
 
 function AddResult() {
@@ -14,9 +14,11 @@ function AddResult() {
     syllabus: "",
     assignment_mark: "",
     exam_mark: "",
+    exam_type: "",
   });
 
   const { classrooms } = useSelector((state) => state.classroom);
+  const { exam_type_list } = useSelector((state) => state.examType)
   const { student_list } = useSelector((state) => state.student);
   const [students, setStudents] = useState([]);
   const [syllabuss, setSyllabus] = useState([]);
@@ -50,6 +52,7 @@ function AddResult() {
 
   useEffect(() => {
     dispatch(classRoomList());
+    dispatch(examTypeList())
   }, [dispatch]);
 
   useEffect(() => {
@@ -83,10 +86,13 @@ function AddResult() {
     try {
       const response = await dispatch(addResult(resultData));
       if (response.error) {
-        console.error(response.error);
+        toast.error("Error saving the result. Result already added to the student for this subject")
+        console.error(response);
       } else {
         toast.success("Result added successfully")
         console.log("Result added successfully");
+        setSelectedClassroom([])
+        setStudents([])
         setFormData({
           student: "",
           syllabus: "",
@@ -165,6 +171,26 @@ function AddResult() {
                           {students.map((student) => (
                             <option key={student.id} value={student.id}>
                               {student.username}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="w-full xl:w-1/2">
+                        <label className="mb-2.5 block text-black dark:text-white">
+                          Exam Type
+                        </label>
+                        <select
+                          className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                          id="exam_type"
+                          name="exam_type"
+                          value={formData.exam_type}
+                          onChange={handleChange}
+                          required
+                        >
+                          <option value="">-------------</option>
+                          {exam_type_list?.map((exam) => (
+                            <option key={exam.id} value={exam.id}>
+                              {exam.name}
                             </option>
                           ))}
                         </select>

@@ -31,7 +31,7 @@ class Result(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['student', 'syllabus', 'exam_date'], name='unique_student_syllabus_examtype')
+            models.UniqueConstraint(fields=['student', 'exam_type', 'syllabus', 'exam_date'], name='unique_student_syllabus_examtype')
         ]
 
     def __str__(self):
