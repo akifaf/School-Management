@@ -26,7 +26,8 @@ urlpatterns = [
     path('teacher-update/<int:pk>/', TeacherView.as_view(), name='teacher-update'),
     path('upload_teacher_files/', TeacherFileUploadView.as_view(), name='teacher-file-upload'),
     path('teacher-files/', TeacherFilesView.as_view(), name='teahcer-files'),
-    
+    path('teacher-classrooms/', TeacherClassListView.as_view(), name='teacher-classrooms'),
+
     # path('subject/', SubjectView.as_view(), name='subject'),
     path('subject/', SubjectListCreateView.as_view(), name='subject-list-create'),
     path('subject/<int:pk>/', SubjectUpdateView.as_view(), name='subject-detail'),

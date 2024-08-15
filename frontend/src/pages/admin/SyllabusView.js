@@ -33,7 +33,7 @@ function SyllabusView() {
   return (
     <>
       <h1 className="text-3xl text-gray-900 mx-3 pb-4 font-bold">
-        Student Management
+        Subject to Teacher Assignment Management
       </h1>
       <Toaster position="top-center" richColors />
 

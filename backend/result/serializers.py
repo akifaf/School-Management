@@ -2,6 +2,8 @@
 from rest_framework import serializers
 from .models import ExamType, Result, Syllabus
 
+
+
 class SyllabusSerializer(serializers.ModelSerializer):
     get_data = serializers.CharField(source='get_dataa', read_only=True)
 
@@ -24,6 +26,15 @@ class SyllabusSerializer(serializers.ModelSerializer):
 
         return data
 
+    def __init__(self, *args, **kwargs):
+        super(SyllabusSerializer, self).__init__(*args, **kwargs)
+        request = self.context.get("request")
+        if request and request.method == "POST":
+            self.Meta.depth = 0
+        else:
+            self.Meta.depth = 3
+
+
 class ExamTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExamType
@@ -34,3 +45,11 @@ class ResultSerializer(serializers.ModelSerializer):
         model = Result
         fields = '__all__'
 
+
+    def __init__(self, *args, **kwargs):
+        super(ResultSerializer, self).__init__(*args, **kwargs)
+        request = self.context.get("request")
+        if request and request.method == "POST":
+            self.Meta.depth = 0
+        else:
+            self.Meta.depth = 2

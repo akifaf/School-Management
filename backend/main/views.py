@@ -23,6 +23,8 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from .models import User, Student, Teacher, ClassRoom, Subject, TeacherFile
 from .serializers import PasswordResetSerializer, UserSerializer, StudentSerializer, TeacherSerializer, ClassroomSerializer, SubjectSerializer, TeacherFileSerializer
+from result.models import Syllabus        
+from result.serializers import SyllabusSerializer
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -200,7 +202,7 @@ class TeacherDetailView(APIView):
 
 
 class BlockUserView(APIView):
-    # permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser]
 
     def post(self, request, pk):
         try:
@@ -225,15 +227,21 @@ class UnBlockUserView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-        
-        
+
+class TeacherClassListView(generics.ListAPIView):
+    serializer_class = SyllabusSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_teacher:
+            classroom = Syllabus.objects.filter(teacher=user).distinct()
+            return classroom
+        return ClassRoom.objects.none()
+
 class ClassRoomAPIView(generics.ListCreateAPIView):
     queryset = ClassRoom.objects.all()
     serializer_class = ClassroomSerializer
-    # classroom = ClassRoom.objects.get(class_no=1, section='A')
-    # strength = classroom.get_strength()
-    # print(f'The strength of the class {classroom} is {strength}')
-
     # permission_classes = [IsAdminUser, IsAuthenticated]
 
 

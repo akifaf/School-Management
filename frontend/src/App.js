@@ -4,10 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import LoginPage from "./pages/LoginPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
-import StudentDashboard from "./pages/student/StudentDashboard";
-import TeacherDashboard from "./pages/teacher/TeacherDashboard";
 import PrivateRouter from "./routes/PrivateRoute";
-import StudentView from "./pages/admin/StudentView";
 import AddStudent from "./pages/admin/AddStudent";
 import StudentLogin from "./pages/student/StudentLogin";
 import AdminLayout from "./layout/AdminLayout";
@@ -24,16 +21,16 @@ import TeacherProfile from "./pages/teacher/Profile";
 import ClassRoomView from "./pages/admin/ClassRoomView";
 import ClassView from "./pages/admin/ClassView";
 import AddClassRoom from "./pages/admin/AddClassRoom";
-import AttendanceForm from "./pages/TakeAttendance";
 import ViewAttendance from "./pages/ViewAttendance";
 import StudentAttendance from "./pages/student/StudentViewAttendance";
-import ResultForm from "./pages/teacher/Result";
-import SyllabusList from "./pages/admin/SyllabusList";
 import SyllabusView from "./pages/admin/SyllabusView";
 import ExamType from "./pages/admin/ExamType";
-import ResultView from "./pages/teacher/ResultView";
 import Settings from "./pages/admin/Settings";
 import AddResult from "./pages/teacher/AddResult";
+import AttendanceForm from "./pages/teacher/TakeAttendance";
+import Result from "./pages/student/Result";
+import ViewResult from "./pages/teacher/ViewResult";
+import StudentResult from "./pages/admin/StudentResult";
 
 export default function App() {
   return (
@@ -61,6 +58,7 @@ export default function App() {
 
             <Route path="/attendance" element={<ViewAttendance /> }/>
             <Route path="/exam-type" element={<ExamType /> }/>
+            <Route path="/view-result" element={<StudentResult/>} />
 
             <Route path="/syllabus" element={<SyllabusView />} />
             <Route path='/settings' element={<ExamType />} />
@@ -74,6 +72,7 @@ export default function App() {
             <Route path="/student-dashboard" element={<StudentProfile />} />
             <Route path="/student-profile" element={<Profile />} />
             <Route path="/student-attendance" element={<StudentAttendance />} />
+            <Route path="/view-result" element={<Result />} />
           </Route>
 
           {/* Teacher Side */}
@@ -82,7 +81,7 @@ export default function App() {
           <Route path="/take-attendance" element={<AttendanceForm />} />
           <Route path="/view-attendance" element={<ViewAttendance />} />
           <Route path="/add-result" element={<AddResult />} />
-          <Route path="/add" element={<ResultView />} />
+          <Route path="/result" element={<ViewResult />} />
           </Route>
 
           <Route path="/" element={<PrivateRouter />} />

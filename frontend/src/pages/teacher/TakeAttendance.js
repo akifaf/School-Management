@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
-import { axiosAttendanceInstance, axiosInstance } from "../axios/AxiosInstance";
+import { axiosAttendanceInstance, axiosInstance } from "../../axios/AxiosInstance";
 import { toast, Toaster } from "sonner";
 import flatpickr from "flatpickr";
-import { studentListByClass } from "../axios/admin/AdminServers";
+import { studentListByClass } from "../../axios/admin/AdminServers";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { take_attendance } from "../axios/teacher.js/teacherServers";
+import { take_attendance } from "../../axios/teacher.js/teacherServers";
 
 const AttendanceForm = () => {
   const [classrooms, setClassrooms] = useState([]);

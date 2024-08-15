@@ -1,4 +1,4 @@
-import { axiosFormInstance } from "../AxiosInstance";
+import { axiosFormInstance, axiosResultInstance } from "../AxiosInstance";
 
 export const updateStudentProfile = async (id, studentData) => {
   try {
@@ -7,5 +7,16 @@ export const updateStudentProfile = async (id, studentData) => {
     return response.data;
   } catch (error) {
     throw error.response.data;
+  }
+};
+
+export const getResult = async (id) => {
+  try {
+    const response = await axiosResultInstance.get(`${id}/`);
+    return response.data;
+  } catch (error) {
+    return {
+      error: error.response ? error.response.data : 'Something went wrong'
+    };
   }
 };

@@ -48,8 +48,15 @@ export const syllabusByClass = createAsyncThunk(
 );
 
 
+
 export const addSubject = createAsyncThunk('subject/add_subject', async (data) => {
   const response = await axiosInstance.post(`/subject/`, JSON.stringify(data));
+  return response
+})
+
+
+export const classByTeacher = createAsyncThunk('teacher_classrooms/', async (data) => {
+  const response = await axiosInstance.get(`/teacher-classrooms/`, JSON.stringify(data));
   return response
 })
 
@@ -57,3 +64,4 @@ export const addResult = createAsyncThunk('result/add_result', async (data) => {
   const response = await axiosResultInstance.post(`/`, JSON.stringify(data));
 return response.data
 })
+

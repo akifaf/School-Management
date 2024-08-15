@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast, Toaster } from "sonner";
 import { classRoomList, deleteSyllabus, subjectList, teacherList } from "../../axios/admin/AdminServers";
-import { axiosInstance, axiosResultInstance } from "../../axios/AxiosInstance";
+import { axiosResultInstance } from "../../axios/AxiosInstance";
 import Modal from "../../components/Modal";
 import { fetchSyllabus } from "../../redux/SyllabusSlice";
 
@@ -42,16 +42,6 @@ const SyllabusList = ({ classRoom }) => {
     return classroom ? `${classroom.class_no} ${classroom.section}` : "Unknown";
   };
 
-  const getSubjectDetails = (id) => {
-    const subject = subjects?.find((s) => s.id === id);
-    return subject ? subject.subject : "Unknown";
-  };
-
-  const getTeacherDetails = (id) => {
-    const teacher = teachers?.find((t) => t.id === id);
-    return teacher ? `${teacher.first_name} ${teacher.last_name}` : "Unknown";
-  };
-
   const handleAddSyllabusSuccess = () => {
     setAddSyllabus(false);
     dispatch(fetchSyllabus());
@@ -76,7 +66,7 @@ const SyllabusList = ({ classRoom }) => {
       });
   };
 
-  const filteredSyllabus = syllabus_list?.filter((item) => item.classroom === selectedClassroom);
+  const filteredSyllabus = syllabus_list?.filter((item) => item.classroom.id === selectedClassroom);
 
   if (loading) return <div>Loading...</div>;
 
@@ -119,10 +109,10 @@ const SyllabusList = ({ classRoom }) => {
               {filteredSyllabus?.map((item) => (
                 <tr key={item.id}>
                   <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                    {getSubjectDetails(item.subject)}
+                    {item.subject.subject}
                   </td>
                   <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                    {getTeacherDetails(item.teacher)}
+                    {item.teacher.username}
                   </td>
                   <td>
                     <button

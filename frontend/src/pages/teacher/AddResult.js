@@ -2,8 +2,16 @@ import React, { useEffect, useRef, useState } from "react";
 import { toast, Toaster } from "sonner";
 import flatpickr from "flatpickr";
 import { useDispatch, useSelector } from "react-redux";
-import { classRoomList, examTypeList, studentListByClass } from "../../axios/admin/AdminServers";
-import { addResult, syllabusByClass } from "../../axios/teacher.js/teacherServers";
+import {
+  classRoomList,
+  examTypeList,
+  studentListByClass,
+} from "../../axios/admin/AdminServers";
+import {
+  addResult,
+  syllabusByClass,
+} from "../../axios/teacher.js/teacherServers";
+import { fetchSyllabus } from "../../redux/SyllabusSlice";
 
 function AddResult() {
   const datepickerRef = useRef(null);
@@ -18,7 +26,7 @@ function AddResult() {
   });
 
   const { classrooms } = useSelector((state) => state.classroom);
-  const { exam_type_list } = useSelector((state) => state.examType)
+  const { exam_type_list } = useSelector((state) => state.examType);
   const { student_list } = useSelector((state) => state.student);
   const [students, setStudents] = useState([]);
   const [syllabuss, setSyllabus] = useState([]);
@@ -30,6 +38,16 @@ function AddResult() {
     const classroom = classrooms.find((c) => c.id === classId);
     setSelectedClassroom(classroom);
 
+    // Fetch syllabuss by classroom
+    const syllabusResponses = await dispatch(syllabusByClass(classId));
+    console.log(syllabusResponses);
+
+    if (!syllabusResponses.payload.length == 0) {
+      setSyllabus(syllabusResponses.payload);
+    } else {
+      toast.warning("Subject not found for this class");
+    }
+
     // Fetch students by classroom
     const studentResponses = await dispatch(
       studentListByClass({
@@ -37,22 +55,20 @@ function AddResult() {
         section: classroom.section,
       })
     );
-    if (!studentResponses.error) {
-      setStudents(studentResponses.payload);
-    }
 
-    // Fetch syllabuss by classroom
-    const syllabusResponses = await dispatch(syllabusByClass(classId));
-    if (!syllabusResponses.error) {
-      setSyllabus(syllabusResponses.payload);
+    if (!studentResponses.payload.length == 0) {
+      setStudents(studentResponses.payload);
+    } else {
+      toast.warning("Student not found", {
+        duration: 7000,
+      });
     }
-    syllabuss.filter((syllabus) => console.log(classId, syllabus.classroom, classId=== syllabus.classroom, 'sadjo') )
-    console.log(syllabuss, classId)
   };
 
   useEffect(() => {
     dispatch(classRoomList());
-    dispatch(examTypeList())
+    dispatch(examTypeList());
+    dispatch(fetchSyllabus())
   }, [dispatch]);
 
   useEffect(() => {
@@ -86,20 +102,21 @@ function AddResult() {
     try {
       const response = await dispatch(addResult(resultData));
       if (response.error) {
-        toast.error("Error saving the result. Result already added to the student for this subject")
+        toast.error(
+          "Error saving the result. Result already added to the student for this subject"
+        );
         console.error(response);
       } else {
-        toast.success("Result added successfully")
+        toast.success("Result added successfully");
         console.log("Result added successfully");
-        setSelectedClassroom([])
-        setStudents([])
+        setSelectedClassroom([]);
+        setStudents([]);
         setFormData({
           student: "",
           syllabus: "",
           assignment_mark: "",
           exam_mark: "",
-        })
-        
+        });
       }
     } catch (error) {
       console.error("Failed to add result:", error);
@@ -140,7 +157,7 @@ function AddResult() {
                   </div>
                   <div className="w-full xl:w-1/2">
                     <label className="mb-2.5 block text-black dark:text-white">
-                      Date:
+                      Exam Date:
                     </label>
                     <input
                       ref={datepickerRef}
@@ -224,7 +241,7 @@ function AddResult() {
                         <input
                           type="text"
                           placeholder="Enter Assignment Mark"
-                          className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                          className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                           name="assignment_mark"
                           value={formData.assignment_mark}
                           onChange={handleChange}
@@ -238,7 +255,7 @@ function AddResult() {
                         <input
                           type="text"
                           placeholder="Enter Exam Mark"
-                          className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                          className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                           name="exam_mark"
                           value={formData.exam_mark}
                           onChange={handleChange}

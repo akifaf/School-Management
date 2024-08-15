@@ -17,6 +17,9 @@ class Syllabus(models.Model):
     
     def get_dataa(self):
         return f'{self.subject.subject} - {self.teacher.username}'
+    
+    class Meta:
+        ordering = ['classroom__class_no', 'classroom__section']
 
 class Result(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)

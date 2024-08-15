@@ -246,3 +246,8 @@ export const deleteSyllabus = createAsyncThunk('syllabus/delete_syllabus', async
   return response
 }
 )
+
+export const syllabusList = createAsyncThunk('syllabus', async (data) => {
+  const response = await axiosResultInstance.get(`/syllabus/`, JSON.stringify(data));
+  return response
+})

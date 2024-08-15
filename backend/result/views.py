@@ -23,39 +23,41 @@ class ResultCreateView(generics.ListCreateAPIView):
     queryset = Result.objects.all()
     serializer_class = ResultSerializer
 
-    def create(self, request, *args, **kwargs):
-        data = request.data
-        serializer = ResultSerializer(data=data)
-        if serializer.is_valid():
-            try:
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            except IntegrityError:
-                return Response(
-                    {"error": "A result for this student, syllabus, and exam type already exists."},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+def create(self, request, *args, **kwargs):
+    data = request.data
+    serializer = ResultSerializer(data=data)
+    if serializer.is_valid():
+        try:
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except IntegrityError as e:
+            if 'unique_student_syllabus_examtype' in str(e):
+                return Response({"error": "This combination of values already exists."}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({"error": "An unexpected database error occurred."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class ResultDetailView(generics.RetrieveUpdateDestroyAPIView):
+class ResultDetailView(generics.ListAPIView):
     queryset = Result.objects.all()
     serializer_class = ResultSerializer
+    lookup_field = 'id'  # Using 'id' to match your URL pattern
 
-    def update(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = ResultSerializer(instance, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def get_object(self):
+        student_id = self.kwargs.get('id')
+        try:
+            return Result.objects.filter(student_id=student_id)
+        except Result.DoesNotExist:
+            raise NotFound(detail="Result not found")
+
 
 class ResultListView(generics.ListAPIView):
     serializer_class = ResultSerializer
 
     def get_queryset(self):
-        student_id = self.kwargs['pk']
-        student = Student.objects.get(id=student_id)
-        return Result.objects.filter(student=student)
+        syllabus_id = self.request.query_params.get('syllabusId', None)
+        if syllabus_id is not None:
+            return Result.objects.filter(syllabus_id=syllabus_id)
+        return Result.objects.none()
 
 class SyllabusListView(generics.ListCreateAPIView):
     queryset = Syllabus.objects.all()

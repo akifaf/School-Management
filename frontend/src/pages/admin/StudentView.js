@@ -42,7 +42,7 @@ function StudentView({ classRoom }) {
       username: student.username,
       phone_number: student.phone_number,
       parent_contact: student.parent_contact,
-      date_of_birth: student.date_of_birth,
+      date_of_birth: student.date_of_birth ? student.date_of_birth : "",
       profile_picture: student.profile_picture,
       admission_date: student.admission_date,
       class_room: student.class_room,
