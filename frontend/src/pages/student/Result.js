@@ -1,39 +1,51 @@
 import React, { useEffect, useState } from 'react';
 import { getResult } from '../../axios/student/StudentServers';
 import { useSelector } from 'react-redux';
+import Loader from '../../Loader/Loader';
+
 
 function Result() {
   const { user } = useSelector(store => store.auth);
   const [resultsByExamType, setResultsByExamType] = useState({});
   const [selectedExamType, setSelectedExamType] = useState('');
+  const [loading, setLoading] = useState(true); 
 
   useEffect(() => {
     const fetchResults = async () => {
-      const response = await getResult(user.id);
-      console.log(response);
+      try {
+        const response = await getResult(user.id);
+        console.log(response);
 
-      if (!response.error) {
-        // Assuming response is an array
-        const groupedResults = response.reduce((acc, result) => {
-          const examType = result.exam_type.name; // Adjust according to your data structure
-          if (!acc[examType]) {
-            acc[examType] = [];
+        if (!response.error) {
+          const groupedResults = response.reduce((acc, result) => {
+            const examType = result.exam_type.name;
+            if (!acc[examType]) {
+              acc[examType] = [];
+            }
+            acc[examType].push(result);
+            return acc;
+          }, {});
+
+          setResultsByExamType(groupedResults);
+          if (Object.keys(groupedResults).length > 0) {
+            setSelectedExamType(Object.keys(groupedResults)[0]);
           }
-          acc[examType].push(result);
-          return acc;
-        }, {});
-
-        setResultsByExamType(groupedResults);
-        if (Object.keys(groupedResults).length > 0) {
-          setSelectedExamType(Object.keys(groupedResults)[0]);
+        } else {
+          console.error(response.error);
         }
-      } else {
-        console.error(response.error);
+      } catch (error) {
+        console.error('Failed to fetch results:', error);
+      } finally {
+        setLoading(false); // Set loading to false once data is fetched
       }
     };
 
     fetchResults();
   }, [user.id]);
+
+  if (loading) {
+    return <Loader />; // Show loader while loading
+  }
 
   return (
     <div className="p-4">
@@ -81,7 +93,7 @@ function Result() {
                   <tr key={key}>
                     <td className="border-b border-[#eee] py-5 px-4 pl-9 dark:border-strokedark xl:pl-11">
                       <h5 className="font-medium text-black dark:text-white">
-                        {result.syllabus.subject.subject} {/* Adjust based on your data */}
+                        {result.syllabus.subject.subject}
                       </h5>
                     </td>
                     <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">

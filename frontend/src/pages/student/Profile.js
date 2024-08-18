@@ -109,11 +109,14 @@ function StudentProfile() {
             <h3 className="mb-1.5 text-2xl font-semibold text-black dark:text-white">
               {studentDetails.first_name} {studentDetails.last_name}
             </h3>
-            <p className="font-medium">{studentDetails.email}</p>
+            <h5 className="mb-1.5 text-2xl font-semibold text-black dark:text-white">
+              Class : {studentDetails.class_room.class_no} {studentDetails.class_room.section}
+            </h5>
             {/* <p className="font-medium">{studentDetails.phone_number}</p> */}
+            <p className="font-medium">{studentDetails.email}</p>
           </div>
           
-          <div className="m-4">
+          <div className="m-3">
             {/* <h4 className="text-xl font-semibold">Student Details</h4> */}
             <p><strong>Roll No:</strong> {studentDetails.roll_no}</p>
             <p><strong>Admission Date:</strong> {studentDetails.admission_date}</p>

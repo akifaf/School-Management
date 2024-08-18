@@ -31,6 +31,9 @@ import AttendanceForm from "./pages/teacher/TakeAttendance";
 import Result from "./pages/student/Result";
 import ViewResult from "./pages/teacher/ViewResult";
 import StudentResult from "./pages/admin/StudentResult";
+import ChatScreenLayout from "./components/Chat/ChatScreenLayout";
+import Chat from "./components/Chat/Chat";
+import StudentTeacher from "./pages/student/StudentTeacher";
 
 export default function App() {
   return (
@@ -72,7 +75,18 @@ export default function App() {
             <Route path="/student-dashboard" element={<StudentProfile />} />
             <Route path="/student-profile" element={<Profile />} />
             <Route path="/student-attendance" element={<StudentAttendance />} />
-            <Route path="/view-result" element={<Result />} />
+            <Route path="/student-result" element={<Result />} />
+            <Route path="/teachers" element={<StudentTeacher />} />
+          </Route>
+
+          
+          <Route element={<ChatScreenLayout/>}>
+          
+            <Route path='/chat/' element= {<Chat/>}></Route>
+            {/* <Route path='/meeting/:userid/:mentorid/:courseid/' element={<ZegoCall/>}></Route>
+            <Route path='mentor/request/form/' element={<MentorRetry/>}></Route> */}
+          
+
           </Route>
 
           {/* Teacher Side */}

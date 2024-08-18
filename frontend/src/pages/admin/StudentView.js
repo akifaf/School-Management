@@ -27,11 +27,23 @@ function StudentView({ classRoom }) {
     class_room: "",
     roll_no: "",
   });
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredStudents, setFilteredStudents] = useState([]);
 
   useEffect(() => {
     console.log(classRoom.class_no, classRoom.section);
     dispatch(studentListByClass({class_no:classRoom.class_no, section:classRoom.section}));
   }, [dispatch, classRoom]);
+
+  useEffect(() => {
+    if (student_list) {
+      setFilteredStudents(
+        student_list.filter((student) =>
+          student.username.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      );
+    }
+  }, [searchQuery, student_list]);
 
   const handleEditUser = (student) => {
     setEditingUser(student);
@@ -77,8 +89,7 @@ function StudentView({ classRoom }) {
       if (response.error) {
         toast.error(response.error);
       } else {
-        
-    dispatch(studentListByClass({class_no:classRoom.class_no, section:classRoom.section}));
+        dispatch(studentListByClass({class_no:classRoom.class_no, section:classRoom.section}));
         toast.success("Student updated successfully");
       }
     } catch (error) {
@@ -89,8 +100,7 @@ function StudentView({ classRoom }) {
   const handleBlockUser = async (student) => {
     try {
       await dispatch(blockUser({ id: student.id }));
-      
-    dispatch(studentListByClass({class_no:classRoom.class_no, section:classRoom.section}));
+      dispatch(studentListByClass({class_no:classRoom.class_no, section:classRoom.section}));
       toast.success(`User ${student.username} has been blocked successfully!`);
     } catch (error) {
       toast.error(`Failed to block user ${student.username}. Please try again.`);
@@ -100,8 +110,7 @@ function StudentView({ classRoom }) {
   const handleUnblockUser = async (student) => {
     try {
       await dispatch(unblockUser({ id: student.id }));
-      
-    dispatch(studentListByClass({class_no:classRoom.class_no, section:classRoom.section}));
+      dispatch(studentListByClass({class_no:classRoom.class_no, section:classRoom.section}));
       toast.success(`User ${student.username} has been unblocked successfully!`);
     } catch (error) {
       toast.error(`Failed to unblock user ${student.username}. Please try again.`);
@@ -115,6 +124,7 @@ function StudentView({ classRoom }) {
       .then((response) => setClassRooms(response.data))
       .catch((error) => console.error("Error fetching classrooms:", error));
   }, []);
+  
   return (
     <>
       <h2 className="text-2xl text-gray-900 mx-3 pb-4 font-bold">
@@ -130,12 +140,12 @@ function StudentView({ classRoom }) {
                 type="text"
                 className="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 placeholder="Search for users"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
             <div>
-            {console.log(classRoom.id)}
-            <Link to="" state={{ some: "value" }} />
-              <Link
+            <Link
               to="/add-student" state={{ classRoom: classRoom.id}}
                 className="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700"
               >
@@ -149,9 +159,6 @@ function StudentView({ classRoom }) {
                 <th scope="col" className="px-6 py-3">
                   ID
                 </th>
-                {/* <th scope="col" className="px-6 py-3">
-                  Image
-                </th> */}
                 <th scope="col" className="px-6 py-3">
                   Name
                 </th>
@@ -185,23 +192,13 @@ function StudentView({ classRoom }) {
                 </tr>
               )}
               {status === "successful" &&
-                student_list &&
-                student_list.length > 0 &&
-                student_list.map((student) => (
+                filteredStudents.length > 0 &&
+                filteredStudents.map((student) => (
                   <tr
                     key={student.id}
                     className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
                   >
                     <td className="px-6 py-4">{student.roll_no}</td>
-                    {/* <td>
-                      <div className="w-20 rounded-full">
-                        <img
-                          className="object-cover rounded-full"
-                          src={student.profile_picture}
-                          alt="Student Profile"
-                        />
-                      </div>
-                    </td> */}
                     <th
                       scope="row"
                       className="flex items-center px-6 py-4 text-gray-900 dark:text-white"

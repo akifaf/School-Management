@@ -167,7 +167,7 @@ class TeacherView(generics.RetrieveUpdateAPIView):
 
 class TeacherFilesView(generics.ListAPIView):
     serializer_class = TeacherFileSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
@@ -176,7 +176,22 @@ class TeacherFilesView(generics.ListAPIView):
         return TeacherFile.objects.none()
     
 
+class TeacherFileDeleteView(APIView):
+    # permission_classes = [IsAuthenticated]
 
+    def delete(self, request, *args, **kwargs):
+        file_id = kwargs.get('file_id')
+        try:
+            file_instance = TeacherFile.objects.get(id=file_id)
+        except TeacherFile.DoesNotExist:
+            return Response({"detail": "File not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        # # Check if the user is authorized to delete the file
+        # if request.user != file_instance.teacher:
+        #     return Response({"detail": "You do not have permission to delete this file."}, status=status.HTTP_403_FORBIDDEN)
+        
+        file_instance.delete()
+        return Response({"detail": "File deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
 
 class TeacherFileUploadView(APIView):
     parser_classes = (MultiPartParser, FormParser)
@@ -198,6 +213,25 @@ class TeacherDetailView(APIView):
         teacher = Teacher.objects.get(id=teacher_id)
         serializer = TeacherSerializer(teacher)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class TeachersByClassView(APIView):
+    
+    def get(self, request, *args, **kwargs):
+        try:
+            student = request.user
+
+            classroom = student.student.class_room
+
+            syllabi = Syllabus.objects.filter(classroom=classroom)
+            # Extract teachers from syllabi
+            teachers = set(syllabus.teacher for syllabus in syllabi)
+
+            # Serialize the teachers
+            serializer = TeacherSerializer(teachers, many=True)
+            return Response(serializer, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 

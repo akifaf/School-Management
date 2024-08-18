@@ -25,15 +25,6 @@ export const take_attendance = async (attendanceData) => {
     }
   };
 
-// export const syllabusByClass = async (id) => {
-//   try {
-//     const response = await axiosResultInstance.get(`syllabus_by_class/${id}/`);
-//     return response.data
-//   } catch (error) {
-//     console.log(error);
-//     return error
-//   }
-// }
 
 export const syllabusByClass = createAsyncThunk(
   'syllabus/fetchByClass',
@@ -65,3 +56,8 @@ export const addResult = createAsyncThunk('result/add_result', async (data) => {
 return response.data
 })
 
+
+export const deleteTeacherFile = createAsyncThunk("files/deleteTeacherFile", async (fileId) => {
+  await axiosInstance.delete(`/teacher-files/delete/${fileId}/`);
+  return fileId;
+});

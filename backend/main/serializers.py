@@ -82,8 +82,17 @@ class StudentSerializer(serializers.ModelSerializer):
             student.set_password(validated_data['password'])
         student.is_student = True
         student.save()
-        
+
         return student 
+        
+    def __init__(self, *args, **kwargs):
+        super(StudentSerializer, self).__init__(*args, **kwargs)
+        request = self.context.get("request")
+        if request and request.method == "POST":
+            self.Meta.depth = 0
+        else:
+            self.Meta.depth = 2
+        
   
     def update(self, instance, validated_data):
         for attr, value in validated_data.items():

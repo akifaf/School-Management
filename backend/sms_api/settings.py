@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,6 +43,7 @@ INSTALLED_APPS = [
     'main',
     'attendance',
     'result',
+    'chat',
     
     'rest_framework',
     'rest_framework_simplejwt',
@@ -88,7 +90,19 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'sms_api.wsgi.application'
+# WSGI_APPLICATION = 'sms_api.wsgi.application'
+
+ASGI_APPLICATION = 'sms_api.asgi.application'
+
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)], 
+        },
+    },
+}
 
 
 # Database
@@ -154,7 +168,7 @@ AUTH_USER_MODEL = 'main.User'
 # JWT configurations
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=50),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=500),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=90),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,

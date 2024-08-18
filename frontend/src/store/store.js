@@ -12,6 +12,7 @@ import studentDetailReducer from "../redux/StudentDetailSlice";
 import attendanceReducer from "../redux/AttendanceSlice";
 import filesReducer from "../redux/fileSlice";
 import examTypeReducer from "../redux/ExamTypeSlice";
+import chatReducer from "../redux/ChatSlice"
 import {
   persistStore,
   persistReducer,
@@ -41,6 +42,7 @@ const rootReducer = {
   files: filesReducer,
   examType: examTypeReducer,
   syllabus: syllabusReducer,
+  chat: chatReducer,
 };
 
 const store = configureStore({

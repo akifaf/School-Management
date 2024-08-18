@@ -136,7 +136,8 @@ function TeacherDashboard() {
               </label>
           </div>
           <div className="">
-            <h3 className="text-black dark:text-white text-2xl font-medium">
+            <h3 className="text-black dark:text-white text-2xl font-medium">\
+            {console.log(teacherDetails)}
               {teacherDetails.username}
             </h3>
             <p> {teacherDetails.email}</p>
