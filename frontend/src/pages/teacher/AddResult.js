@@ -9,6 +9,7 @@ import {
 } from "../../axios/admin/AdminServers";
 import {
   addResult,
+  classByTeacher,
   syllabusByClass,
 } from "../../axios/teacher.js/teacherServers";
 import { fetchSyllabus } from "../../redux/SyllabusSlice";
@@ -25,7 +26,7 @@ function AddResult() {
     exam_type: "",
   });
 
-  const { classrooms } = useSelector((state) => state.classroom);
+  const [classrooms, setClassrooms] = useState([]);
   const { exam_type_list } = useSelector((state) => state.examType);
   const { student_list } = useSelector((state) => state.student);
   const [students, setStudents] = useState([]);
@@ -35,7 +36,7 @@ function AddResult() {
 
   const handleClassChange = async (e) => {
     const classId = parseInt(e.target.value);
-    const classroom = classrooms.find((c) => c.id === classId);
+    const classroom = classrooms.find((c) => c.classroom.id === classId);
     setSelectedClassroom(classroom);
 
     // Fetch syllabuss by classroom
@@ -51,8 +52,8 @@ function AddResult() {
     // Fetch students by classroom
     const studentResponses = await dispatch(
       studentListByClass({
-        class_no: classroom.class_no,
-        section: classroom.section,
+        class_no: classroom.classroom.class_no,
+        section: classroom.classroom.section,
       })
     );
 
@@ -65,8 +66,18 @@ function AddResult() {
     }
   };
 
+  
   useEffect(() => {
-    dispatch(classRoomList());
+    const fetchClassroom = async () => {
+      const response = await dispatch(classByTeacher());
+      if (response.payload){
+        setClassrooms(response.payload.data);
+      }
+    }
+    fetchClassroom();
+  }, []);
+
+  useEffect(() => {
     dispatch(examTypeList());
     dispatch(fetchSyllabus())
   }, [dispatch]);
@@ -149,8 +160,8 @@ function AddResult() {
                     >
                       <option value="">-------------</option>
                       {classrooms?.map((classroom) => (
-                        <option key={classroom.id} value={classroom.id}>
-                          {classroom.class_no} {classroom.section}
+                        <option key={classroom.id} value={classroom.classroom.id}>
+                          {classroom.classroom.class_no} {classroom.classroom.section}
                         </option>
                       ))}
                     </select>

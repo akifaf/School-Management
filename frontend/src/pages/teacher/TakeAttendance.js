@@ -5,7 +5,7 @@ import flatpickr from "flatpickr";
 import { studentListByClass } from "../../axios/admin/AdminServers";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { take_attendance } from "../../axios/teacher.js/teacherServers";
+import { classByTeacher, take_attendance } from "../../axios/teacher.js/teacherServers";
 
 const AttendanceForm = () => {
   const [classrooms, setClassrooms] = useState([]);
@@ -15,13 +15,15 @@ const AttendanceForm = () => {
   const [attendance, setAttendance] = useState({});
   const datepickerRef = useRef(null);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   useEffect(() => {
-    axiosInstance
-      .get("classroom/")
-      .then((response) => setClassrooms(response.data))
-      .catch((error) => console.error("Error fetching classrooms:", error));
+    const fetchClassroom = async () => {
+      const response = await dispatch(classByTeacher());
+      if (response.payload){
+        setClassrooms(response.payload.data);
+      }
+    }
+    fetchClassroom();
   }, []);
 
   useEffect(() => {
@@ -79,7 +81,25 @@ const AttendanceForm = () => {
   return (
     
     <div className="p-4">
+    <div className="flex">
+      {!students.length == 0 && (
+        <button onClick={() => setStudents([])} className="px-2 mx-6 mb-4 border border-current rounded-full">      <svg
+            className="fill-current"
+            width="20"
+            height="18"
+            viewBox="0 0 20 18"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M19 8.175H2.98748L9.36248 1.6875C9.69998 1.35 9.69998 0.825 9.36248 0.4875C9.02498 0.15 8.49998 0.15 8.16248 0.4875L0.399976 8.3625C0.0624756 8.7 0.0624756 9.225 0.399976 9.5625L8.16248 17.4375C8.31248 17.5875 8.53748 17.7 8.76248 17.7C8.98748 17.7 9.17498 17.625 9.36248 17.475C9.69998 17.1375 9.69998 16.6125 9.36248 16.275L3.02498 9.8625H19C19.45 9.8625 19.825 9.4875 19.825 9.0375C19.825 8.55 19.45 8.175 19 8.175Z"
+              fill=""
+            />
+          </svg>
+          </button>   
+      )}
       <h1 className="text-3xl text-gray-900 pb-4 font-bold">Mark Attendance</h1>
+      </div>
       <Toaster position="top-center" richColors />
       {students.length === 0 ? (
         <>
@@ -96,8 +116,8 @@ const AttendanceForm = () => {
               >
                 <option value="">Select a classroom</option>
                 {classrooms.map((classroom) => (
-                  <option key={classroom.id} value={JSON.stringify(classroom)}>
-                    {classroom.class_no} {classroom.section}
+                  <option key={classroom.id} value={JSON.stringify(classroom.classroom)}>
+                    {classroom.classroom.class_no} {classroom.classroom.section}
                   </option>
                 ))}
               </select>
@@ -138,7 +158,7 @@ const AttendanceForm = () => {
                 <thead>
                   <tr className="bg-gray-2 text-left dark:bg-meta-4">
                     <th className="min-w-[220px] py-4 px-4 font-medium text-black dark:text-white xl:pl-11">
-                      Roll Numberr
+                      Roll Number
                     </th>
                     <th className="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">
                       Name

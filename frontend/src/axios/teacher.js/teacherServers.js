@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { axiosAttendanceInstance, axiosFormInstance, axiosInstance, axiosResultInstance } from "../AxiosInstance";
+import { fetchTeacherFiles } from "../../redux/fileSlice";
 
 
 export const fetchTeacher = createAsyncThunk('teacher/fetchTeacher', async (id) => {
@@ -56,8 +57,11 @@ export const addResult = createAsyncThunk('result/add_result', async (data) => {
 return response.data
 })
 
-
-export const deleteTeacherFile = createAsyncThunk("files/deleteTeacherFile", async (fileId) => {
-  await axiosInstance.delete(`/teacher-files/delete/${fileId}/`);
-  return fileId;
-});
+export const deleteTeacherFile = createAsyncThunk(
+  "files/deleteTeacherFile",
+  async (fileId) => {
+    await axiosInstance.delete(`/teacher-files/delete/${fileId}/`);
+    // After deletion, fetch the updated list of files
+    return fileId;
+  }
+);

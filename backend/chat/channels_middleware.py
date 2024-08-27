@@ -27,9 +27,9 @@ class JWTwebsocketMiddleware(BaseMiddleware):
 
         try:
             user = await authentication.authenticate_websocket(scope, token)
-            print(user, 'usssssssss')
+            # print(user, 'usssssssss')
             if user is not None:
-                print('yess')
+                # print('yess')
                 scope['user'] = user        
             else:
                 print('none')

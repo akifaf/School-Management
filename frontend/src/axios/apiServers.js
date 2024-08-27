@@ -2,12 +2,13 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import apiInstance from "./axios";
 import { jwtDecode } from "jwt-decode";
+import { API_BASE_URL } from "../constants/urls";
 
 export const loginUser = createAsyncThunk(
     "auth/loginUser",
     async (userData, { rejectWithValue }) => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/token/", {
+        const response = await fetch(`${API_BASE_URL}token/`, {
           method: "POST",
           headers: {
             "Content-type": "application/json",
@@ -27,25 +28,25 @@ export const loginUser = createAsyncThunk(
       }
     }
   );
+
   
-  export const refreshauthToken = createAsyncThunk(
-    "auth/refreshauthToken",
-    async (refreshToken, { rejectWithValue }) => {
-      try {
-        const response = await axios.post("http://127.0.0.1:8000/api/token/refresh/", {refresh: refreshToken});
+export const refreshauthToken = async ()=>{
+  const tokens = JSON.parse(localStorage.getItem('authTokens'));
+  const refreshToken = tokens.refresh
   
-        if (!response.ok) {
-          console.log("error in refresh");
-          throw new Error("Token refresh failed");
-        }
-  
-        const data = await response.json();
-        return data;
-      } catch (error) {
-        return rejectWithValue(error.message);
+  try{
+      const response = await axios.post(`${API_BASE_URL}token/refresh/`,
+          {refresh:refreshToken})
+      if (response.status === 200 || response.status === 201){
+          localStorage.setItem('authTokens', JSON.stringify(response.data))
+          return response
       }
-    }
-  );
+  }
+  catch(error){
+      console.log('Failed to refresh token',error)
+  }
+  return null
+}
 
   export const passwordSet = async (data) => {
     try {

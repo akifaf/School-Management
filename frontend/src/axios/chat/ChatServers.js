@@ -10,6 +10,18 @@ export const getChat = async (id)=>{
         return res.data
     }
     catch(error){
+        console.log(error);
+        
+        throw error
+    }
+}
+
+export const getNotification = async () => {
+    try {
+        const res = await axiosChatInstance.get('/notification')
+        console.log(res.data)
+        return res.data
+    } catch (error) {
         throw error
     }
 }

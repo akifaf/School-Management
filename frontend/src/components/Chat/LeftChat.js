@@ -2,82 +2,117 @@ import { jwtDecode } from 'jwt-decode';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { axiosChatInstance } from '../../axios/AxiosInstance';
-// import { Avatar, Stack } from '@mui/material';
-// import { stringAvatar } from './mui';
+import { Avatar } from '@mui/material';
+import { stringAvatar } from './mui';
+import { Badge } from 'antd';
+import { getNotification } from '../../axios/chat/ChatServers';
 
 const LeftChat = ({ Chat = () => {} }) => {
-  const auth = useSelector((state) => state.auth);
-  const accessToken = auth?.accessToken;
+    const auth = useSelector((state) => state.auth);
+    const accessToken = auth?.accessToken;
 
-  const [chatUsers, setChatUsers] = useState([]);
+    const [chatUsers, setChatUsers] = useState([]);
+    const [notifications, setNotifications] = useState([]);
 
-  useEffect(() => {
-    if (accessToken) {
-      const userId = jwtDecode(accessToken).user_id;
-      console.log('user',userId)
-      const getChatUsers = async () => {
-        try {
-          const res = await axiosChatInstance.get(`/chat_users/${userId}/`);
-          setChatUsers(res.data);
-          console.log('res', res.data);
-          
-        } catch (error) {
-          console.log('Error while fetching users:', error);
+    // useEffect(() => {
+    //     const fetchNotifications = async () => {
+    //         try {
+    //             const data = await getNotification();
+    //             setNotifications(data);
+    //         } catch (error) {
+    //             console.error('Error fetching notifications:', error);
+    //         }
+    //     };
+
+    //     // Fetch notifications every 1 second
+    //     const intervalId = setInterval(fetchNotifications, 1000);
+
+    //     // Cleanup interval on component unmount
+    //     return () => clearInterval(intervalId);
+    // }, []);
+
+    useEffect(() => {
+        if (accessToken) {
+            const userId = jwtDecode(accessToken).user_id;
+            const fetchChatUsers = async () => {
+                try {
+                    const res = await axiosChatInstance.get(`/chat_users/${userId}/`);
+                    setChatUsers(res.data);
+                    console.log('ehllo')
+                } catch (error) {
+                    console.error('Error while fetching users:', error);
+                }
+            };
+            fetchChatUsers();
         }
-      };
+    }, [accessToken]);
 
-      getChatUsers();
-    }
-  }, [accessToken]);
+    return (
+        <div id="plist" className="people-list p-2">
+            <ul className="list-unstyled chat-list mt-2 mb-0 px-2">
+                {Array.isArray(chatUsers) && chatUsers.length > 0 ? (
+                    chatUsers.map((user) => {
+                        const isCurrentUser = user.user1.id === jwtDecode(accessToken).user_id;
+                        const displayUser = !isCurrentUser ? user.user1 : user.user2;
+                        const chatRoomId = user.id;  // Adjust based on actual structure
+                        const unreadCount = notifications.find(notification => notification.chat_room_id === chatRoomId)?.unread_messages_count || 0;
 
-  return (
-    <div id="plist" className="people-list p-2">
-      <ul className="list-unstyled chat-list mt-2 mb-0 px-2">
-        {Array.isArray(chatUsers) && chatUsers.length > 0 ? (
-          chatUsers.map((user) => (
-            <ChatUserItem user={user} userId={jwtDecode(accessToken).user_id} key={user.id} Chat={Chat} />
-          ))
-        ) : (
-          <p>No users available.</p> // Display a message if there are no users
-        )}
-      </ul>
-    </div>
-  );
+                        return (
+                            <ChatUserItem
+                                user={user}
+                                userId={jwtDecode(accessToken).user_id}
+                                key={user.id}
+                                Chat={Chat}
+                                unreadCount={unreadCount}
+                            />
+                        );
+                    })
+                ) : (
+                    <p>No users available.</p>
+                )}
+            </ul>
+        </div>
+    );
 };
 
 export default LeftChat;
 
-const ChatUserItem = ({ user, userId, Chat = () => {} }) => {
+const ChatUserItem = ({ user, userId, Chat = () => {}, unreadCount }) => {
     const isCurrentUser = user.user1.id === userId;
     const displayUser = !isCurrentUser ? user.user1 : user.user2;
-  
+
     // Determine user role
     const isStudent = displayUser.is_student;
     const isTeacher = displayUser.is_teacher;
     const isAdmin = displayUser.is_admin;
-  
+
     // Define user role label
     let roleLabel = '';
     if (isStudent) roleLabel = 'Student';
     if (isTeacher) roleLabel = 'Teacher';
     if (isAdmin) roleLabel = 'Admin';
-  
+
     return (
-      <button
-        style={{ width: '100%', borderRadius: '5px', marginBottom: '10px', textAlign: 'left' }}
-        onClick={() => Chat({ id: displayUser.id, username: displayUser.username })}
-      >
-        <li className="d-flex p-2 align-items-center">
-          {/* <Stack direction="row" spacing={2} className="mx-2">
-            <Avatar {...stringAvatar(`${displayUser.first_name} ${displayUser.last_name}`)} />
-          </Stack> */}
-          {/* {`${displayUser.username}`} */}
-          <div>
-            <h5 className="mt-2 mb-0">{displayUser.first_name} {displayUser.last_name}</h5>
-            <h6 m-0 bg-slate-900>{roleLabel}</h6>
-          </div>
-        </li>
-      </button>
+        <button
+            style={{
+                width: '100%',
+                borderRadius: '5px',
+                marginBottom: '10px',
+                textAlign: 'left',
+                display: 'flex',
+                alignItems: 'center',
+                padding: '10px',
+                border: '1px solid #ddd',
+                backgroundColor: '#fff',
+            }}
+            onClick={() => Chat({ id: displayUser.id, username: displayUser.username })}
+        >
+            <Avatar {...stringAvatar(`${displayUser.first_name} ${displayUser.last_name}`)} style={{ marginRight: '10px' }} />
+            <div style={{ flex: 1 }}>
+                <h5 className="mt-2 mb-0">{displayUser.first_name} {displayUser.last_name}</h5>
+                <h6 className="m-0" style={{ color: '#555' }}>{roleLabel}</h6>
+            </div>
+            {unreadCount > 0 && <Badge count={unreadCount} showZero color="#52c41a" />}
+        </button>
     );
-  };
-  
+};

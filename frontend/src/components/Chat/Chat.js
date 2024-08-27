@@ -22,7 +22,7 @@ const Chat = () => {
     
     const style = {
         marginTop:'20px',
-        marginLeft:'150px'
+        marginLeft:'70px'
     }
   
 
@@ -34,7 +34,7 @@ const Chat = () => {
       <div className="container" style={style}>
         <div className="row clearfix">
             <div className="col-lg-12">
-                <h2>Chat</h2>
+                {/* <h2>Chat</h2> */}
                 
                 <div className="card left-area">
                     <LeftChat Chat = {Chat} />

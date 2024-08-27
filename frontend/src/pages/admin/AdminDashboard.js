@@ -1,20 +1,21 @@
 import React, { useEffect } from "react";
 import AdminLayout from "../../layout/AdminLayout";
 import Sidebar from "../../components/admin/Sidebar";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import CardDataStats from "../../components/admin/CardDataStats";
 import ChartThree from "../../components/Charts/ChartThree";
 import ChartTwo from "../../components/Charts/ChartTwo";
 import ChartOne from "../../components/Charts/ChartOne";
+import { studentList } from "../../axios/admin/AdminServers";
 
 function AdminDashboard() {
 
   
-  // const tokens = JSON.parse(localStorage.getItem('authTokens'));
-  // const accessToken = tokens.access;
-  // const refreshToken = tokens.refresh
+  const tokens = JSON.parse(localStorage.getItem('authTokens'));
+  const accessToken = tokens.access;
+  const refreshToken = tokens.refresh
+  const dispatch = useDispatch();
 
-  const { accessToken, refreshToken } = useSelector((store) => store.auth)
 
   return (
    

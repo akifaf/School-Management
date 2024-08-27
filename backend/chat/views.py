@@ -6,6 +6,7 @@ from django.db.models import Q
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response 
 from rest_framework.decorators import api_view
+from django.db.models import Count
 
 class MessageListView(generics.ListCreateAPIView):
     serializer_class = MessageSerializer
@@ -16,14 +17,12 @@ class MessageListView(generics.ListCreateAPIView):
 
         try:
             chat_room = ChatRooms.objects.filter(
-                Q(user1_id = user_id1, user2_id = user_id2) | Q(user1_id = user_id2, user2_id = user_id1)
-
-            )
+                Q(user1_id = user_id1, user2_id = user_id2) | Q(user1_id = user_id2, user2_id = user_id1))
             print("_____",chat_room)
             if not chat_room:
                 raise NotFound('Room not found')
-            
-            return Messages.objects.filter(chat_room__in = chat_room).order_by('-timestamp')
+            messages = Messages.objects.filter(chat_room__in = chat_room).order_by('-timestamp')
+            return messages
         except ChatRooms.DoesNotExist:
             return Messages.objects.none()
 
@@ -45,6 +44,7 @@ def AddChatRoom(request):
 
             # Check if chat room already exists
             if chat_rooms.exists():
+                print("YES")
                 chat_room = chat_rooms.first()  # Assuming you want to use the first found chat room
                 serializer = ChatroomSerializer(chat_room)
                 return Response(serializer.data, status=status.HTTP_200_OK)
@@ -70,3 +70,36 @@ def ListChatUsers(request,user_id):
 
         except ChatRooms.DoesNotExist:
             return ChatRooms.objects.none()
+
+from django.db.models import Count, Q
+from rest_framework import generics
+from .models import ChatRooms
+from .serializers import ChatroomSerializer
+from rest_framework.response import Response
+
+class ChatNotificationView(generics.ListAPIView):
+    serializer_class = ChatroomSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        chat_rooms = ChatRooms.objects.filter(Q(user1=user) | Q(user2=user))
+        
+        # Annotate each chat room with the count of unread messages
+        chat_rooms = chat_rooms.annotate(
+            unread_messages_count=Count('messages', filter=Q(messages__user__ne=user, messages__is_read=False))
+        )
+        
+        return chat_rooms
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serialized_data = [
+            {
+                'chat_room_id': chat_room.id,
+                'unread_messages_count': chat_room.unread_messages_count,
+                'users': ChatroomSerializer(chat_room).data
+            }
+            for chat_room in queryset
+        ]
+        return Response(serialized_data)
+

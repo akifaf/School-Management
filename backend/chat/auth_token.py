@@ -17,7 +17,7 @@ class JwtAuthentication(BaseAuthentication):
             
             # Retrieve the user based on the user_id
             user = User.objects.get(id=user_id)
-            print("auth_token_user_id: ", user_id)
+            # print("auth_token_user_id: ", user_id)
             
             return user
         

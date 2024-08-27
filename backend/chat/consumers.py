@@ -13,12 +13,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.request_user = self.scope['user']
             if self.request_user.is_authenticated:
                 self.chat_with_user = self.scope["url_route"]["kwargs"]["id"]
-                user_ids = [int(self.request_user.id), int(self.chat_with_user)]
-                user_ids = sorted(user_ids)
+                user_ids = sorted([int(self.request_user.id), int(self.chat_with_user)])
                 self.room_group_name = f"chat_{user_ids[0]}-{user_ids[1]}"
                 
                 await self.channel_layer.group_add(self.room_group_name, self.channel_name)
-                self.chat_room = await self.get_or_create_chat_room()
+                self.chat_room, _ = await self.get_or_create_chat_room()
                 await self.accept()
                 logger.info(f"WebSocket CONNECT: {self.room_group_name} by user {self.request_user.id}")
             else:
@@ -39,36 +38,34 @@ class ChatConsumer(AsyncWebsocketConsumer):
             user2_id=user_ids[1],
             defaults={'user1_id': user_ids[0], 'user2_id': user_ids[1]}
         )
-        
         return chat_room, created
 
     async def receive(self, text_data):
         try:
             data = json.loads(text_data)
             message = data["message"]
-            message_id = await self.save_message(message)
+            type = data.get("message_type", 'text_message')
+            message_id = await self.save_message(message, type)
             await self.channel_layer.group_send(
                 self.room_group_name, 
                 {
                     "type": "chat_message", 
                     "message_id": message_id,
-                    "message": message
+                    "message": message,
                 }
             )
-            # logger.info(f"Message received in room {self.room_group_name}: {message}")
         except Exception as e:
-            # logger.error(f"Error in receive: {str(e)}")
             await self.send(text_data=json.dumps({"error": str(e)}))
 
     @database_sync_to_async
-    def save_message(self, message_content):
-        chat_room = self.chat_room[0]
+    def save_message(self, message_content, type):
+        chat_room = self.chat_room
         message = Messages.objects.create(
             chat_room=chat_room,
             user=self.request_user,
-            content=message_content
+            content=message_content,
+            message_type=type,
         )
-        # logger.info(f"Message saved in room {self.room_group_name}: {message_content}")
         return message.id
 
     async def disconnect(self, code):
@@ -77,10 +74,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 self.room_group_name, 
                 self.channel_name
             )
-            # logger.info(f"WebSocket DISCONNECT: {self.room_group_name} by user {self.request_user.id}")
         except Exception as e:
             print(f"Error in disconnect: {str(e)}")
-            # logger.error(f"Error in disconnect: {str(e)}")
 
     @database_sync_to_async
     def get_message_object(self, message_id):
@@ -91,18 +86,34 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'chat_room': message.chat_room_id,
                 'user': message.user.id,
                 'content': message.content,
-                'timestamp': message.timestamp.isoformat()
+                'message_type': message.message_type,
+                'timestamp': message.timestamp.isoformat(),
+                'is_read': message.is_read,
             }
             return message_obj
         except Messages.DoesNotExist:
             return None
 
+    @database_sync_to_async
+    def mark_message_as_read(self, message_id):
+        try:
+            message = Messages.objects.get(id=message_id)
+            print(message, 'message')
+            if message.user.id != self.request_user.id:  # Ensure it's the recipient
+                message.is_read = True
+                message.save()
+        except Messages.DoesNotExist:
+            pass
+
     async def chat_message(self, event):
         try:
             message_id = event["message_id"]
             message_obj = await self.get_message_object(message_id)
+            print(self.request_user.id, message_obj['user'], 'suerie')
+            # Mark the message as read if the recipient receives it
+            if message_obj['user'] != self.request_user.id:  # Recipient received the message
+                await self.mark_message_as_read(message_id)
+            
             await self.send(text_data=json.dumps(message_obj))
-            # logger.info(f"Message sent in room {self.room_group_name}: {message_obj}")
         except Exception as e:
             print(f"Error in chat_message: {str(e)}")
-            # logger.error(f"Error in chat_message: {str(e)}")

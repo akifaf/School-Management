@@ -43,6 +43,10 @@ const authSlice = createSlice({
       state.is_teacher = false
       localStorage.removeItem('authTokens');
     },
+    updateAuthToken: (state, action) => {
+      state.accessToken = action.payload.access;
+      state.refreshToken = action.payload.refresh;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -66,6 +70,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { logoutUser } = authSlice.actions;
+export const { logoutUser, updateAuthToken } = authSlice.actions;
 
 export default authSlice.reducer;

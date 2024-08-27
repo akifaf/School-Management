@@ -83,9 +83,6 @@ export default function App() {
           <Route element={<ChatScreenLayout/>}>
           
             <Route path='/chat/' element= {<Chat/>}></Route>
-            {/* <Route path='/meeting/:userid/:mentorid/:courseid/' element={<ZegoCall/>}></Route>
-            <Route path='mentor/request/form/' element={<MentorRetry/>}></Route> */}
-          
 
           </Route>
 

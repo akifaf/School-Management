@@ -3,6 +3,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 import { axiosInstance } from '../axios/AxiosInstance';
 import axios from 'axios';
+import { deleteTeacherFile } from '../axios/teacher.js/teacherServers';
 
 
 export const fetchTeacherFiles = createAsyncThunk(
@@ -38,6 +39,11 @@ const fileSlice = createSlice({
       .addCase(fetchTeacherFiles.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message;
+      })
+      .addCase(deleteTeacherFile.fulfilled, (state, action) => {
+        state.teacherFiles = state.teacherFiles.filter(
+          (file) => file.id !== action.payload
+        );
       });
   },
 });

@@ -271,6 +271,9 @@ class TeacherClassListView(generics.ListAPIView):
         if user.is_teacher:
             classroom = Syllabus.objects.filter(teacher=user).distinct()
             return classroom
+        elif user.is_admin:
+            classroom = Syllabus.objects.all().distinct()
+            return classroom        
         return ClassRoom.objects.none()
 
 class ClassRoomAPIView(generics.ListCreateAPIView):

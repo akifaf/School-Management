@@ -22,18 +22,6 @@ const classroomSlice = createSlice({
         state.status = 'failed';
         state.error = action.error.message;
       })
-      .addCase(addClassRoom.fulfilled, (state, action) => {
-        state.classrooms.push(action.payload);
-      })
-      .addCase(editClassRoom.fulfilled, (state, action) => {
-        const index = state.classrooms.findIndex(classRoom => classRoom.id === action.payload.id);
-        if (index !== -1) {
-          state.classrooms[index] = action.payload;
-        }
-      })
-      .addCase(deleteClassRoom.fulfilled, (state, action) => {
-        state.classrooms = state.classrooms.filter(classRoom => classRoom.id !== action.payload);
-      });
   },
 });
 
