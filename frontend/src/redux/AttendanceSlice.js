@@ -3,11 +3,24 @@ import { axiosAttendanceInstance } from '../axios/AxiosInstance';
 
 export const fetchStudentAttendance = createAsyncThunk(
   'attendance/fetchStudentAttendance',
-  async (studentId, thunkAPI) => {
-    const response = await axiosAttendanceInstance.get(`student_attendance/${studentId}/`);
+  async ({ studentId, fromDate, toDate }) => {
+    console.log(studentId, fromDate, toDate);
+    
+    const response = await axiosAttendanceInstance.get(`student_attendance/${studentId}/`, {
+      params: { from_date: fromDate, to_date: toDate },
+    });
     return response.data;
   }
 );
+
+
+// export const fetchStudentAttendance = createAsyncThunk(
+//   'attendance/fetchStudentAttendance',
+//   async (studentId, thunkAPI) => {
+//     const response = await axiosAttendanceInstance.get(`student_attendance/${studentId}/`);
+//     return response.data;
+//   }
+// );
 
 const attendanceSlice = createSlice({
   name: 'attendance',

@@ -46,11 +46,31 @@ class ViewAttendance(APIView):
             attendance.save()
         return Response(status=status.HTTP_200_OK)
 
-
 class StudentAttendanceView(APIView):
-    def get(self, request, student_id, date=None):
-        if date:
-            attendance_records = Attendance.objects.filter(student_id=student_id, date=date)
+    def get(self, request, student_id):
+        # Extract date parameters from the query parameters
+        from_date = request.query_params.get('from_date')
+        to_date = request.query_params.get('to_date')
+        
+        # Convert date parameters to datetime objects if they are provided
+        # if from_date:
+        #     try:
+        #         from_date = datetime.strptime(from_date, '%Y-%m-%d')
+        #     except ValueError:
+        #         return Response({'error': 'Invalid from_date format. Use YYYY-MM-DD.'}, status=status.HTTP_400_BAD_REQUEST)
+        # if to_date:
+        #     try:
+        #         to_date = datetime.strptime(to_date, '%Y-%m-%d')
+        #     except ValueError:
+        #         return Response({'error': 'Invalid to_date format. Use YYYY-MM-DD.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Filter attendance records based on the provided dates
+        if from_date and to_date:
+            attendance_records = Attendance.objects.filter(student_id=student_id, date__range=[from_date, to_date])
+        elif from_date:
+            attendance_records = Attendance.objects.filter(student_id=student_id, date__gte=from_date)
+        elif to_date:
+            attendance_records = Attendance.objects.filter(student_id=student_id, date__lte=to_date)
         else:
             attendance_records = Attendance.objects.filter(student_id=student_id)
         
