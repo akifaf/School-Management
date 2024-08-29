@@ -122,7 +122,7 @@ export const fetchTeacherDetails = createAsyncThunk(
   'student/fetchTeacherDetails',
   async (id, { rejectWithValue }) => {
       try {
-          const response = await axios.get(`/teacher-update/${id}/`);
+          const response = await axiosInstance.get(`/teacher-update/${id}/`);
           return response.data;
       } catch (error) {
           return rejectWithValue(error.response.data);

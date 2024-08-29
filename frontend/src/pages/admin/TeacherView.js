@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-
-import Multiselect from "multiselect-react-dropdown";
-import { MultiSelect } from "primereact/multiselect";
-
-import { blockUser, subjectList, teacherList, unblockUser, updateTeacher } from "../../axios/admin/AdminServers";
+import {
+  blockUser,
+  subjectList,
+  teacherList,
+  unblockUser,
+  updateTeacher,
+} from "../../axios/admin/AdminServers";
 import { Link } from "react-router-dom";
 import { Toaster, toast } from "sonner";
 import { axiosInstance } from "../../axios/AxiosInstance";
+import TeacherDetails from "../../components/admin/TeacherDetails";
 
 function TeacherView() {
   const dispatch = useDispatch();
@@ -19,10 +22,10 @@ function TeacherView() {
 
   const subject_list = useSelector((state) => state.subject.subject_list);
   const subjectStatus = useSelector((state) => state.subject.status);
-  
+
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredTeachers, setFilteredTeachers] = useState([]);
-
+  const [teacherDetails, setTeacherDetails] = useState();
 
   useEffect(() => {
     if (teachers_list) {
@@ -56,21 +59,23 @@ function TeacherView() {
       username: teacher.first_name + " " + teacher.last_name,
       phone_number: teacher.phone_number,
       joined_date: teacher.joined_date,
-      subject:teacher.subject,
+      subject: teacher.subject,
     });
   };
 
   const handleChange = (e) => {
     const { name, value, type, options } = e.target;
 
-    if (type == 'select-multiple' && name === 'subject') {
-      const selectedOptions = Array.from(options).filter(option => option.selected).map(option => option.value);
+    if (type == "select-multiple" && name === "subject") {
+      const selectedOptions = Array.from(options)
+        .filter((option) => option.selected)
+        .map((option) => option.value);
       setFormData({
         ...formData,
-        [name]: selectedOptions
+        [name]: selectedOptions,
       });
-    } else {      
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    } else {
+      setFormData({ ...formData, [e.target.name]: e.target.value });
     }
   };
 
@@ -82,10 +87,14 @@ function TeacherView() {
   }, []);
 
   useEffect(() => {
-    if (!subject_list && subjectStatus !== 'loading') {
+    if (!subject_list && subjectStatus !== "loading") {
       dispatch(subjectList());
     }
-  }, [dispatch, subject_list, subjectStatus])
+  }, [dispatch, subject_list, subjectStatus]);
+
+  const handleBack = () => {
+    setTeacherDetails();
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -99,20 +108,19 @@ function TeacherView() {
       username: formData.first_name + " " + formData.last_name,
     };
 
-      const response = await 
-        updateTeacher({ id: editingUser.id, teacherData })
-      
-      setEditingUser(null);
-      if (response.error) {
-        if (response.error.email){
-          toast.error(response.error.email);
-        } else {
-          toast.error('Something went wrong')
-        }
+    const response = await updateTeacher({ id: editingUser.id, teacherData });
+
+    setEditingUser(null);
+    if (response.error) {
+      if (response.error.email) {
+        toast.error(response.error.email);
       } else {
-        dispatch(teacherList());
-        toast.success("Teacher updated Successfully");
+        toast.error("Something went wrong");
       }
+    } else {
+      dispatch(teacherList());
+      toast.success("Teacher updated Successfully");
+    }
   };
 
   useEffect(() => {
@@ -151,10 +159,14 @@ function TeacherView() {
 
   return (
     <>
-      <h1 className="text-3xl text-gray-900 mx-3 pb-4 font-bold">Teachers</h1>
       <Toaster position="top-center" richColors />
-      {!editingUser ? (
+      {teacherDetails ? (
+        <TeacherDetails teacher={teacherDetails} onBack={handleBack} />
+      ) : !editingUser ? (
         <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+          <h1 className="text-3xl text-gray-900 mx-3 pb-4 font-bold">
+            Teachers
+          </h1>
           <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-900">
             <div className="relative">
               <input
@@ -215,7 +227,6 @@ function TeacherView() {
                   </td>
                 </tr>
               )}
-              {/* {console.log(teachers_list)} */}
               {status === "successful" &&
                 teachers_list &&
                 teachers_list.length > 0 &&
@@ -230,19 +241,27 @@ function TeacherView() {
                           teacher.is_active ? "bg-green-500" : "bg-red-500"
                         } mr-3`}
                       ></div>
-                      <div className="flex flex-col">
-                        <div className="text-base font-semibold">
+                      <button
+                        onClick={() => {
+                          setTeacherDetails(teacher);
+                        }}
+                        className="flex flex-col"
+                      >
+                        <div className="hover:text-blue-700 text-base font-semibold">
                           {teacher.username}
                         </div>
-                      </div>
+                      </button>
                     </div>
-                    <td className=" py-4">{ teacher.phone_number}</td>
+                    <td className=" py-4">{teacher.phone_number}</td>
                     <td className=" py-4">{teacher.email}</td>
                     <td className=" py-4">
-                    
-                    {teacher.subject?.map(subject => 
-                    subject_list?.find(sub => sub.id === subject)?.subject
-                    ).join(', ')}
+                      {teacher.subject
+                        ?.map(
+                          (subject) =>
+                            subject_list?.find((sub) => sub.id === subject)
+                              ?.subject
+                        )
+                        .join(", ")}
                     </td>
                     <td className=" py-4">
                       {teacher.is_active ? (
@@ -347,43 +366,6 @@ function TeacherView() {
             </div>
 
             <div className="flex flex-wrap -mx-3 mb-6">
-              <div className="w-full px-3">
-                <label
-                  className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-                  htmlFor="password"
-                >
-                  Password
-                </label>
-                <input
-                  className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-                  id="password"
-                  name="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="******************"
-                />
-              </div>
-              <div className="w-full px-3">
-                <label
-                  className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-                  htmlFor="password"
-                >
-                  Confirm Password
-                </label>
-                <input
-                  className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-                  id="password2"
-                  name="password2"
-                  type="password"
-                  value={formData.password2}
-                  onChange={handleChange}
-                  placeholder="******************"
-                />
-              </div>
-            </div>
-
-            <div className="flex flex-wrap -mx-3 mb-6">
               <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
                 <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
                   Phone Number
@@ -406,53 +388,21 @@ function TeacherView() {
                 >
                   Subject
                 </label>
-
-                {/* <MultiSelect
-                  value={subject.id}
-                  onSelect={(e) => {e}}
-                  name='subject'
-                  options={subjects}
-                  optionLabel="subject"
-                  display="chip"
-                  placeholder="Select Subject"
-                  maxSelectedLabels={3}
-                  className="w-full md:w-20rem"
-                /> */}
-                {/* <Multiselect
-                options={subjects}
-                selectedValues={formData.subject}
-                onSelect={(event)=>{setSubject(event)}}
-                onRemove={(event)=>{setSubject(event)}}
-                displayValue="subject" 
-                /> */}
-                <select multiple
-                    className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                    id="subject"
-                    name="subject"
-                    value={formData.subject}
-                    onChange={handleChange}
-                    required
-                  >
-                   {subjects.map((subject) => (
-                      <option key={subject.id} value={subject.id}>
-                        {subject.subject}
-                      </option>
-                    ))}
-                  </select>
-                {/* <select className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                  id="subject" name="subject" 
+                <select
+                  multiple
+                  className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                  id="subject"
+                  name="subject"
                   value={formData.subject}
-                  onChange={handleChange}  
+                  onChange={handleChange}
                   required
                 >
-                  <option value="">-------------</option>
-                  {subjects &&
-                    subjects.map((subject) => (
-                      <option key={subject.id} value={subject.id}>
-                        {subject.subject}
-                      </option>
-                    ))}
-                </select> */}
+                  {subjects.map((subject) => (
+                    <option key={subject.id} value={subject.id}>
+                      {subject.subject}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
@@ -483,7 +433,7 @@ function TeacherView() {
                   type="submit"
                   className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                 >
-                  Add Teacher
+                  Save Changes
                 </button>
               </div>
             </div>

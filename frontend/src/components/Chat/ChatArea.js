@@ -41,6 +41,23 @@ const ChatArea = ({ user, username }) => {
   const photoInputRef = useRef(null);
   const videoInputRef = useRef(null);
 
+// for read message update
+
+  const markMessagesAsRead = (messageIds) => {
+    console.log('wordikn');
+    
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      const data = {
+        action: "read_status_update",
+        message_ids: messageIds,
+      };
+      socket.send(JSON.stringify(data));
+    } else {
+      console.error("WebSocket is not open to send read status.");
+    }
+  };
+  
+
   // functions for multimedia senting
   const handlePhotoClick = () => {
     if (photoInputRef.current) {
@@ -92,6 +109,7 @@ const ChatArea = ({ user, username }) => {
           const content = {
             message: data.public_id,
             message_type: "photo",
+            action: "chat_message",
           };
 
           // Send the message via WebSocket
@@ -148,6 +166,7 @@ const ChatArea = ({ user, username }) => {
           const message = {
             message: data.secure_url,
             message_type: "video",
+            action: "chat_message",
           };
 
           // Send the message via WebSocket
@@ -165,6 +184,19 @@ const ChatArea = ({ user, username }) => {
         console.log(err);
       });
   };
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      const unreadMessageIds = messages
+        .filter((msg) => !msg.is_read && msg.user !== userId)  // Only mark messages from others as read
+        .map((msg) => msg.id);  // Assuming each message has a unique ID
+  
+      if (unreadMessageIds.length > 0) {
+        markMessagesAsRead(unreadMessageIds);
+      }
+    }
+  }, [messages]);
+  
 
   useEffect(() => {
     if (userId && access) {
@@ -237,6 +269,8 @@ const ChatArea = ({ user, username }) => {
       newSocket.onmessage = (event) => {
         const data = JSON.parse(event.data);
         if (data.content) {
+          console.log('data', data);
+          
           setMessages((prevMessages) => [...prevMessages, data]);
         } else {
           console.log(data);
@@ -251,7 +285,7 @@ const ChatArea = ({ user, username }) => {
       if (socket.readyState === WebSocket.CLOSED) {
         getSocket();
       } else if (socket.readyState === WebSocket.OPEN) {
-        const data = { message: newMessage };
+        const data = { message: newMessage, action: "chat_message"};
         socket.send(JSON.stringify(data));
         setNewMessage("");
       }

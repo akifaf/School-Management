@@ -90,34 +90,6 @@ const MessageContainer = styled.div`
       : "flex-start"}; // Align messages to right or left based on sender
 `;
 
-const MessageInfo = styled.div`
-  padding-left: 10px;
-  background: ${({ isSender }) => (isSender ? "green" : "black")};
-  border-radius: 10px;
-  max-width: 350px;
-  word-wrap: break-word;
-
-  > h5 {
-    color: white;
-    padding: 5px;
-  }
-  > span {
-    color: white;
-    padding-right: 5px;
-    font-size: 18px;
-  }
-`;
-
-const Nametag = styled.div`
-  padding-top: 5px;
-  padding-bottom: 5px;
-  padding-right: 5px;
-  color: #a9b5c7;
-  font-size: 11px;
-  display: flex;
-  align-item: start;
-  font-weight: bold;
-`;
 
 const StyledImage = styled.img`
   max-width: 150px; /* Adjust the maximum width as per your preference */

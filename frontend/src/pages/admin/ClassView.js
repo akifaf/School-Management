@@ -20,7 +20,7 @@ function ClassView() {
   }, []);
 
   useEffect(() => {
-    if (!teachers && teacherStatus !== 'loading') {
+    if (!teachers && teacherStatus !== "loading") {
       dispatch(teacherList());
     }
   }, [dispatch, teachers, teacherStatus]);
@@ -29,38 +29,50 @@ function ClassView() {
     setSelectedClass(classItem);
   };
 
+  const handleBack = () => {
+    setSelectedClass(null);
+  };
+
   return (
     <>
-      <h1 className="text-3xl text-gray-900 mx-3 pb-4 font-bold">
-        Student Management
-      </h1>
       <Toaster position="top-center" richColors />
 
       {!selectedClass ? (
-        <div className="flex flex-wrap gap-4 justify-center">
-          {classRooms.map((classItem, index) => (
-            <div
-              key={index}
-              className="max-w-xs p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 flex-1 sm:flex-none sm:w-1/3 cursor-pointer"
-              onClick={() => handleClassClick(classItem)}
-            >
-              <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                {`Class ${classItem.class_no}`}
-              </h5>
-              <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
-                {`Section ${classItem.section}`}
-              </p>
-              <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
-              {`Class Teacher: ${teachers ? (teachers.find(teacher => teacher.id === classItem.class_teacher)?.username) : null }`}
-              </p>
-              <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
-              {`Class Strength: ${classItem.class_strength}`}
-              </p>
-            </div>
-          ))}
-        </div>
+        <>
+          <h1 className="text-3xl text-gray-900 mx-3 pb-4 font-bold">
+            Student Management
+          </h1>
+          <div className="flex flex-wrap gap-4 justify-center">
+            {classRooms.map((classItem, index) => (
+              <div
+                key={index}
+                className="max-w-xs p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 flex-1 sm:flex-none sm:w-1/3 cursor-pointer"
+                onClick={() => handleClassClick(classItem)}
+              >
+                <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                  {`Class ${classItem.class_no}`}
+                </h5>
+                <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
+                  {`Section ${classItem.section}`}
+                </p>
+                <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
+                  {`Class Teacher: ${
+                    teachers
+                      ? teachers.find(
+                          (teacher) => teacher.id === classItem.class_teacher
+                        )?.username
+                      : null
+                  }`}
+                </p>
+                <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
+                  {`Class Strength: ${classItem.class_strength}`}
+                </p>
+              </div>
+            ))}
+          </div>
+        </>
       ) : (
-        <StudentView classRoom={selectedClass} />
+        <StudentView classRoom={selectedClass} onBack={handleBack} />
       )}
     </>
   );

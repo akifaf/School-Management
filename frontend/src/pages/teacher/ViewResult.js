@@ -21,13 +21,16 @@ function ViewResult() {
     // Fetch results for the selected class and subject (syllabus)
     try {
       setLoading(true);
-      const response = await axiosResultInstance.get(`results/?syllabusId=${classroom.id}`);
+      const response = await axiosResultInstance.get(
+        `results/?syllabusId=${classroom.id}`
+      );
       setResults(response.data);
 
       // Extract unique exam types from results
-      const uniqueExamTypes = [...new Set(response.data.map(result => result.exam_type.name))];
+      const uniqueExamTypes = [
+        ...new Set(response.data.map((result) => result.exam_type.name)),
+      ];
       setExamTypes(uniqueExamTypes);
-
     } catch (error) {
       console.error("Error fetching results:", error);
     } finally {
@@ -39,10 +42,12 @@ function ViewResult() {
     setSelectedExamType(e.target.value);
   };
 
-//   const filteredResults = ''
-//     ? results.filter(result => result.exam_type.name === selectedExamType)
-//     : results;
-  const filteredResults = results.filter(result => result.exam_type.name == selectedExamType)
+  //   const filteredResults = ''
+  //     ? results.filter(result => result.exam_type.name === selectedExamType)
+  //     : results;
+  const filteredResults = results.filter(
+    (result) => result.exam_type.name == selectedExamType
+  );
 
   useEffect(() => {
     const getClassrooms = async () => {
@@ -70,7 +75,9 @@ function ViewResult() {
             <div className="p-10">
               <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
                 <div className="w-full xl:w-1/2">
-                  <label className="mb-2.5 block text-black dark:text-white">Class</label>
+                  <label className="mb-2.5 block text-black dark:text-white">
+                    Class
+                  </label>
                   <select
                     className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                     id="classroom"
@@ -82,7 +89,9 @@ function ViewResult() {
                     <option value="">-------------</option>
                     {classrooms.map((classroom) => (
                       <option key={classroom.id} value={classroom.id}>
-                        {classroom.classroom.class_no} {classroom.classroom.section} - {classroom.subject.subject}
+                        {classroom.classroom.class_no}{" "}
+                        {classroom.classroom.section} -{" "}
+                        {classroom.subject.subject}
                       </option>
                     ))}
                   </select>
@@ -90,7 +99,9 @@ function ViewResult() {
 
                 {examTypes.length > 0 && (
                   <div className="w-full xl:w-1/2">
-                    <label className="mb-2.5 block text-black dark:text-white">Exam Type</label>
+                    <label className="mb-2.5 block text-black dark:text-white">
+                      Exam Type
+                    </label>
                     <select
                       className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                       id="examType"
@@ -114,7 +125,9 @@ function ViewResult() {
                 <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark mt-6">
                   <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
                     <h3 className="text-xl text-gray-900 font-bold">
-                      Results for {selectedClassroom.classroom.class_no} {selectedClassroom.classroom.section} - {selectedClassroom.subject.subject}
+                      Results for {selectedClassroom.classroom.class_no}{" "}
+                      {selectedClassroom.classroom.section} -{" "}
+                      {selectedClassroom.subject.subject}
                     </h3>
                   </div>
                   <div className="p-6">
@@ -123,7 +136,7 @@ function ViewResult() {
                     ) : results.length > 0 ? (
                       <table className="w-full table-auto">
                         <thead>
-                        {console.log(filteredResults)}
+                          {console.log(filteredResults)}
                           <tr className="bg-gray-2 text-left dark:bg-meta-4">
                             <th className="py-2 px-4">Student</th>
                             <th className="py-2 px-4">Exam Date</th>
@@ -134,10 +147,18 @@ function ViewResult() {
                         <tbody>
                           {filteredResults.map((result, index) => (
                             <tr key={index}>
-                              <td className="border-b border-[#eee] py-2 px-4">{result.student.username}</td>
-                              <td className="border-b border-[#eee] py-2 px-4">{result.exam_date}</td>
-                              <td className="border-b border-[#eee] py-2 px-4">{result.assignment_mark}</td>
-                              <td className="border-b border-[#eee] py-2 px-4">{result.exam_mark}</td>
+                              <td className="border-b border-[#eee] py-2 px-4">
+                                {result.student.username}
+                              </td>
+                              <td className="border-b border-[#eee] py-2 px-4">
+                                {result.exam_date}
+                              </td>
+                              <td className="border-b border-[#eee] py-2 px-4">
+                                {result.assignment_mark}
+                              </td>
+                              <td className="border-b border-[#eee] py-2 px-4">
+                                {result.exam_mark}
+                              </td>
                             </tr>
                           ))}
                         </tbody>

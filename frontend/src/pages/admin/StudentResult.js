@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { axiosResultInstance } from "../../axios/AxiosInstance";
-import { classByTeacher } from "../../axios/teacher.js/teacherServers";
 import { useDispatch, useSelector } from "react-redux";
 import { Toaster } from "sonner";
 import { syllabusList } from "../../axios/admin/AdminServers";

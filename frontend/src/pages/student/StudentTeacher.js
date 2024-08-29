@@ -13,22 +13,6 @@ function StudentTeacher() {
   const [syllabus, setTeachers] = useState(null);
   const navigate = useNavigate();
 
-//   const handleChat=useCallback(async()=>{
-//     const ids = {
-//         "user_id1":user.id,
-//         "user_id2":mentorId,
-//     }
-//     try{
-//         const res = await addChatRoom(ids)
-//         console.log(res,'ss')
-//         // navigate('/chat/')
-//         window.open(`${Vurl}chat/`)
-        
-//       }catch(error){
-//         console.log(error,"error in chat")
-//       }
-// },[])
-
 const handleSendMessage = async (teacherId) => {
     console.log(`Send message to teacher with ID: ${teacherId}`);
     const ids = {
@@ -43,9 +27,7 @@ const handleSendMessage = async (teacherId) => {
         console.log(error, 'error');
         
     }
-
 };
-
 
   useEffect(() => {
     const fetchDetails = async () => {

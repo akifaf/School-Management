@@ -71,35 +71,36 @@ def ListChatUsers(request,user_id):
         except ChatRooms.DoesNotExist:
             return ChatRooms.objects.none()
 
-from django.db.models import Count, Q
-from rest_framework import generics
-from .models import ChatRooms
-from .serializers import ChatroomSerializer
-from rest_framework.response import Response
-
 class ChatNotificationView(generics.ListAPIView):
     serializer_class = ChatroomSerializer
 
     def get_queryset(self):
         user = self.request.user
         chat_rooms = ChatRooms.objects.filter(Q(user1=user) | Q(user2=user))
+        # print(user)
+        
+        # # Annotate each chat room with the count of unread messages
+        # chat_rooms = chat_rooms.annotate(
+        #     unread_messages_count=Count('message', 
+        #                                 filter=Q(message__user=user, message__is_read=False))
+        # )
         
         # Annotate each chat room with the count of unread messages
         chat_rooms = chat_rooms.annotate(
-            unread_messages_count=Count('messages', filter=Q(messages__user__ne=user, messages__is_read=False))
+            unread_messages_count=Count(
+                'message',
+                filter=Q(message__is_read=False) &
+                    #    Q(user2=user) &  # The current user is the recipient (user2)
+                       ~Q(message__user=user)  # The sender is user1 (and not the current user)
+            )
         )
-        
-        return chat_rooms
+        notifications = [
+            {'chat_room_id': chat_room.id, 'unread_messages_count': chat_room.unread_messages_count}
+            for chat_room in chat_rooms
+        ]
+        # print(notifications, 'notification')
+        return notifications
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        serialized_data = [
-            {
-                'chat_room_id': chat_room.id,
-                'unread_messages_count': chat_room.unread_messages_count,
-                'users': ChatroomSerializer(chat_room).data
-            }
-            for chat_room in queryset
-        ]
-        return Response(serialized_data)
-
+        return Response(queryset)

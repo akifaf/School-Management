@@ -14,7 +14,12 @@ function AdminDashboard() {
   const tokens = JSON.parse(localStorage.getItem('authTokens'));
   const accessToken = tokens.access;
   const refreshToken = tokens.refresh
+  const { student_list } = useSelector((store) => store.student);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(studentList());
+  }, [dispatch]);
 
 
   return (

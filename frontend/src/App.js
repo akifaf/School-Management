@@ -25,7 +25,6 @@ import ViewAttendance from "./pages/ViewAttendance";
 import StudentAttendance from "./pages/student/StudentViewAttendance";
 import SyllabusView from "./pages/admin/SyllabusView";
 import ExamType from "./pages/admin/ExamType";
-import Settings from "./pages/admin/Settings";
 import AddResult from "./pages/teacher/AddResult";
 import AttendanceForm from "./pages/teacher/TakeAttendance";
 import Result from "./pages/student/Result";
@@ -59,15 +58,14 @@ export default function App() {
             <Route path="/class" element={<ClassRoomView />} />
             <Route path="/add-classroom" element={<AddClassRoom />} />
 
-            <Route path="/attendance" element={<ViewAttendance /> }/>
-            <Route path="/exam-type" element={<ExamType /> }/>
-            <Route path="/view-result" element={<StudentResult/>} />
+            <Route path="/attendance" element={<ViewAttendance />} />
+            <Route path="/exam-type" element={<ExamType />} />
+            <Route path="/view-result" element={<StudentResult />} />
 
             <Route path="/syllabus" element={<SyllabusView />} />
-            <Route path='/settings' element={<ExamType />} />
+            <Route path="/settings" element={<ExamType />} />
 
             <Route path="/admin-profile" element={<Profile />} />
-
           </Route>
 
           {/* Student Side */}
@@ -79,20 +77,17 @@ export default function App() {
             <Route path="/teachers" element={<StudentTeacher />} />
           </Route>
 
-          
-          <Route element={<ChatScreenLayout/>}>
-          
-            <Route path='/chat/' element= {<Chat/>}></Route>
-
+          <Route element={<ChatScreenLayout />}>
+            <Route path="/chat/" element={<Chat />}></Route>
           </Route>
 
           {/* Teacher Side */}
-          <Route element={<TeacherLayout />} >
-          <Route path="/teacher-dashboard" element={<TeacherProfile />} />
-          <Route path="/take-attendance" element={<AttendanceForm />} />
-          <Route path="/view-attendance" element={<ViewAttendance />} />
-          <Route path="/add-result" element={<AddResult />} />
-          <Route path="/result" element={<ViewResult />} />
+          <Route element={<TeacherLayout />}>
+            <Route path="/teacher-dashboard" element={<TeacherProfile />} />
+            <Route path="/take-attendance" element={<AttendanceForm />} />
+            <Route path="/view-attendance" element={<ViewAttendance />} />
+            <Route path="/add-result" element={<AddResult />} />
+            <Route path="/result" element={<ViewResult />} />
           </Route>
 
           <Route path="/" element={<PrivateRouter />} />
@@ -101,4 +96,3 @@ export default function App() {
     </>
   );
 }
-

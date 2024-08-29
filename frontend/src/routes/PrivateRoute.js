@@ -49,35 +49,4 @@ const PrivateRouter = ({ children, ...rest }) => {
     
 }
 
-// const PrivateRouter = ({ children, ...rest }) => {
-//   const token = localStorage.getItem('authTokens');
-//   const navigate = useNavigate();
-
-//   useEffect(() => {
-//     if (!token) {
-//       navigate("/login");
-//     }
-//   }, [token, navigate]);
-
-//   if (token) {
-//     const decoded = jwtDecode(token);
-//     if (decoded.is_admin) {
-//       console.log("Admin page");
-//       navigate('admin-dashboard/')
-//     } else if (decoded.is_student) {
-//         return <div>
-//             <StudentDashboard />
-//         </div>
-//     } else if (decoded.is_teacher) {
-//         return <div>
-//             <TeacherDashboard />
-//         </div>
-//     }
-//   } else {
-//     return <div>
-//     <LoginPage />
-// </div>
-//   }
-// };
-
 export default PrivateRouter;

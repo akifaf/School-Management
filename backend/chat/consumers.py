@@ -43,39 +43,60 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         try:
             data = json.loads(text_data)
-            message = data["message"]
-            type = data.get("message_type", 'text_message')
-            message_id = await self.save_message(message, type)
-            await self.channel_layer.group_send(
-                self.room_group_name, 
-                {
-                    "type": "chat_message", 
-                    "message_id": message_id,
-                    "message": message,
-                }
-            )
+            action = data["action"]
+
+            if action == "chat_message":
+                message_content = data["message"]
+                message_type = data.get("message_type", 'text_message')
+                message_id = await self.save_message(message_content, message_type)
+                await self.channel_layer.group_send(
+                    self.room_group_name, 
+                    {
+                        "type": "chat_message", 
+                        "message_id": message_id,
+                        "message": message_content,
+                    }
+                )
+                
+            elif action == "read_status_update":
+                await self.mark_all_messages_as_read()
+
         except Exception as e:
             await self.send(text_data=json.dumps({"error": str(e)}))
 
     @database_sync_to_async
-    def save_message(self, message_content, type):
+    def save_message(self, message_content, message_type):
         chat_room = self.chat_room
         message = Messages.objects.create(
             chat_room=chat_room,
             user=self.request_user,
             content=message_content,
-            message_type=type,
+            message_type=message_type,
         )
         return message.id
 
-    async def disconnect(self, code):
+    @database_sync_to_async
+    def mark_message_as_read(self, message_id):
         try:
-            await self.channel_layer.group_discard(
-                self.room_group_name, 
-                self.channel_name
-            )
+            message = Messages.objects.get(id=message_id)
+            if message.user.id != self.request_user.id:  # Ensure it's the recipient
+                print(message, '..............')
+                message.is_read = True
+                message.save()
+                print(message, '..............')
+        except Messages.DoesNotExist:
+            pass
+
+    @database_sync_to_async
+    def mark_all_messages_as_read(self):
+        # Mark all messages in the conversation as read by the current user
+        try:
+            messages = Messages.objects.filter(chat_room=self.chat_room, is_read=False).exclude(user=self.request_user)
+            for message in messages:
+                message.is_read = True
+                message.save()
         except Exception as e:
-            print(f"Error in disconnect: {str(e)}")
+            print(f"Error in mark_all_messages_as_read: {str(e)}")
 
     @database_sync_to_async
     def get_message_object(self, message_id):
@@ -94,22 +115,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
         except Messages.DoesNotExist:
             return None
 
-    @database_sync_to_async
-    def mark_message_as_read(self, message_id):
-        try:
-            message = Messages.objects.get(id=message_id)
-            print(message, 'message')
-            if message.user.id != self.request_user.id:  # Ensure it's the recipient
-                message.is_read = True
-                message.save()
-        except Messages.DoesNotExist:
-            pass
-
     async def chat_message(self, event):
         try:
             message_id = event["message_id"]
             message_obj = await self.get_message_object(message_id)
-            print(self.request_user.id, message_obj['user'], 'suerie')
+
             # Mark the message as read if the recipient receives it
             if message_obj['user'] != self.request_user.id:  # Recipient received the message
                 await self.mark_message_as_read(message_id)
@@ -117,3 +127,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.send(text_data=json.dumps(message_obj))
         except Exception as e:
             print(f"Error in chat_message: {str(e)}")
+
+    async def disconnect(self, code):
+        try:
+            await self.channel_layer.group_discard(
+                self.room_group_name, 
+                self.channel_name
+            )
+        except Exception as e:
+            print(f"Error in disconnect: {str(e)}")
+

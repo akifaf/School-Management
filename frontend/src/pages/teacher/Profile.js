@@ -1,18 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  updateTeacher,
-  uploadProfilePicture,
   fetchTeacherDetails,
   subjectList,
-} from "../../axios/admin/AdminServers"; // Assuming you have an API function to fetch and update teacher details
+} from "../../axios/admin/AdminServers"; 
 import defaultProfile from "../../images/user/default_profile.png";
 import { toast, Toaster } from "sonner";
 import { deleteTeacherFile, updateTeacherProfile } from "../../axios/teacher.js/teacherServers";
 import { fetchTeacherFiles } from "../../redux/fileSlice";
 import { MdOutlineDelete } from "react-icons/md";
 
-function TeacherDashboard() {
+function TeacherDetails() {
   const { user } = useSelector((store) => store.auth);
   const { teacherFiles, status: fileStatus } = useSelector(
     (store) => store.files
@@ -33,26 +31,26 @@ function TeacherDashboard() {
       }
     };
 
-    const fetchFiles = async () => {
+    const fetchFiles = async (user) => {
       try {
-        await dispatch(fetchTeacherFiles());
+        await dispatch(fetchTeacherFiles(user.id));
       } catch (error) {
         console.log("Error fetching teacher files: ", error);
       }
     };
 
     fetchDetails();
-    fetchFiles();
+    fetchFiles(user);
   }, [dispatch, user.id]);
 
   const getSubjectDetails = (ids) => {
   
-    const subjectsDetails = ids.map((id) => {
+    const subjectsDetails = ids?.map((id) => {
       const subject = subjects?.find((s) => s.id === id);
       return subject ? subject.subject : "Unknown";
     });
   
-    return subjectsDetails.join(", "); 
+    return subjectsDetails?.join(", "); 
   };
 
   const handleFileChange = (e) => {
@@ -169,7 +167,7 @@ function TeacherDashboard() {
 {fileStatus === "succeeded" && teacherFiles.length>0 && (
   <ul>
   <h4 className="text-lg font-medium pt-3">Certificates</h4>
-    {teacherFiles.map((file) => (
+    {teacherFiles?.map((file) => (
       <li key={file.id} className="flex justify-center pt-2">
         <div className="flex items-center space-x-3.5">
           <a href={file.file} target="_blank" rel="noopener noreferrer">
@@ -192,4 +190,4 @@ function TeacherDashboard() {
   );
 }
 
-export default TeacherDashboard;
+export default TeacherDetails;

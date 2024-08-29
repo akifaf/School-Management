@@ -1,7 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { axiosAttendanceInstance, axiosFormInstance, axiosInstance, axiosResultInstance } from "../AxiosInstance";
-import { fetchTeacherFiles } from "../../redux/fileSlice";
-
 
 export const fetchTeacher = createAsyncThunk('teacher/fetchTeacher', async (id) => {
     const response = await axiosInstance.get(`/teacher-update/${id}/`);
@@ -12,7 +10,6 @@ export const updateTeacherProfile = async (id, teacherData) => {
       const response = await axiosFormInstance.patch(`teacher-update/${id}/`, teacherData);
       console.log(response);
       return response;
-  
   };
 
 export const take_attendance = async (attendanceData) => {

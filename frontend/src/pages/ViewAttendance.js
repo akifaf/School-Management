@@ -15,28 +15,18 @@ const ViewAttendance = () => {
   const datepickerRef = useRef(null);
   const dispatch = useDispatch();
   const student_list = useSelector((state) => state.student.student_list);
-  const presentCount = Object.values(attendance).filter(
-    (isPresent) => isPresent
-  ).length;
+  const presentCount = Object.values(attendance).filter(isPresent => isPresent).length;
   const absentCount = students.length - presentCount;
-
-  // useEffect(() => {
-  //   axiosInstance
-  //     .get("classroom/")
-  //     .then((response) => setClassrooms(response.data))
-  //     .catch((error) => console.error("Error fetching classrooms:", error));
-  // }, []);
 
   useEffect(() => {
     const fetchClassroom = async () => {
       const response = await dispatch(classByTeacher());
-      if (response.payload){
-        setClassrooms(response.payload.data);
+      if (response.payload) {
+        setClassrooms(response.payload.data); // Ensure data structure is correct
       }
-    }
+    };
     fetchClassroom();
-  }, []);
-
+  }, [dispatch]);
 
   useEffect(() => {
     flatpickr(datepickerRef.current, {
@@ -62,15 +52,13 @@ const ViewAttendance = () => {
       return;
     }
 
-    dispatch(
-      studentListByClass({
-        class_no: selectedClassroom.class_no,
-        section: selectedClassroom.section,
-      })
-    );
+    dispatch(studentListByClass({
+      class_no: selectedClassroom.classroom.class_no,
+      section: selectedClassroom.classroom.section,
+    }));
 
     axiosAttendanceInstance
-      .get(`view_attendance/${selectedClassroom.id}/${selectedDate}/`)
+      .get(`view_attendance/${selectedClassroom.classroom.id}/${selectedDate}/`)
       .then((response) => {
         if (response.data.length === 0) {
           toast.warning("No Data found");
@@ -87,8 +75,10 @@ const ViewAttendance = () => {
 
   const handleClassChange = (e) => {
     const classId = e.target.value;
-    const classroom = classrooms?.find((c) => c.id === parseInt(classId));
+    const classroom = classrooms?.find((c) => c.classroom.id === parseInt(classId));
     setSelectedClassroom(classroom);
+    console.log(classroom.classroom);
+    
   };
 
   const handleSubmit = (e) => {
@@ -105,10 +95,7 @@ const ViewAttendance = () => {
     }));
 
     axiosAttendanceInstance
-      .put(
-        `view_attendance/${selectedClassroom.id}/${selectedDate}/`,
-        attendanceData
-      )
+      .put(`view_attendance/${selectedClassroom.id}/${selectedDate}/`, attendanceData)
       .then(() => {
         toast.success("Attendance updated successfully");
         setStudents([]);
@@ -128,6 +115,7 @@ const ViewAttendance = () => {
     <div className="p-4">
       <h1 className="text-3xl text-gray-900 pb-4 font-bold">View Attendance</h1>
       <Toaster position="top-center" richColors />
+
       {students.length === 0 ? (
         <>
           <div className="flex space-x-4 mb-4">
@@ -137,7 +125,7 @@ const ViewAttendance = () => {
               </label>
               <select
                 onChange={handleClassChange}
-                value={selectedClassroom ? selectedClassroom.id : ""}
+                value={selectedClassroom ? selectedClassroom.classroom.id : ""}
                 className="block w-full bg-gray-200 border border-gray-200 text-gray-700 py-2 px-3 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                 required
               >
@@ -179,7 +167,7 @@ const ViewAttendance = () => {
               </div>
               <div>Date: {selectedDate}</div>
             </div>
-            <div className="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5  dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
+            <div className="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
               <div className="flex justify-between items-center mb-4 font-bold">
                 <div>
                   <span className="font-medium">Total Students: </span>
@@ -228,7 +216,7 @@ const ViewAttendance = () => {
                         <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                           <input
                             type="checkbox"
-                            checked={attendance[student.student]}
+                            checked={attendance[student.student] || false}
                             onChange={(e) =>
                               setAttendance({
                                 ...attendance,
@@ -246,9 +234,9 @@ const ViewAttendance = () => {
               </table>
             </div>
           </div>
-          {/* {console.log(isPastDate(selectedDate))} */}
           {!isPastDate(selectedDate) && (
             <button
+
               type="submit"
               className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 mt-4"
             >

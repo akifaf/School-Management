@@ -1,4 +1,4 @@
-import { jwtDecode } from 'jwt-decode';
+import {jwtDecode} from 'jwt-decode'; // Import correctly
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { axiosChatInstance } from '../../axios/AxiosInstance';
@@ -14,22 +14,20 @@ const LeftChat = ({ Chat = () => {} }) => {
     const [chatUsers, setChatUsers] = useState([]);
     const [notifications, setNotifications] = useState([]);
 
-    // useEffect(() => {
-    //     const fetchNotifications = async () => {
-    //         try {
-    //             const data = await getNotification();
-    //             setNotifications(data);
-    //         } catch (error) {
-    //             console.error('Error fetching notifications:', error);
-    //         }
-    //     };
+    useEffect(() => {
+        const fetchNotifications = async () => {
+            try {
+                const data = await getNotification();
+                setNotifications(data);
+            } catch (error) {
+                console.error('Error fetching notifications:', error);
+            }
+        };
 
-    //     // Fetch notifications every 1 second
-    //     const intervalId = setInterval(fetchNotifications, 1000);
+        const intervalId = setInterval(fetchNotifications, 1000);
 
-    //     // Cleanup interval on component unmount
-    //     return () => clearInterval(intervalId);
-    // }, []);
+        return () => clearInterval(intervalId);
+    }, []);
 
     useEffect(() => {
         if (accessToken) {
@@ -38,7 +36,6 @@ const LeftChat = ({ Chat = () => {} }) => {
                 try {
                     const res = await axiosChatInstance.get(`/chat_users/${userId}/`);
                     setChatUsers(res.data);
-                    console.log('ehllo')
                 } catch (error) {
                     console.error('Error while fetching users:', error);
                 }
@@ -52,15 +49,16 @@ const LeftChat = ({ Chat = () => {} }) => {
             <ul className="list-unstyled chat-list mt-2 mb-0 px-2">
                 {Array.isArray(chatUsers) && chatUsers.length > 0 ? (
                     chatUsers.map((user) => {
-                        const isCurrentUser = user.user1.id === jwtDecode(accessToken).user_id;
+                        const userId = jwtDecode(accessToken).user_id;
+                        const isCurrentUser = user.user1.id === userId;
                         const displayUser = !isCurrentUser ? user.user1 : user.user2;
-                        const chatRoomId = user.id;  // Adjust based on actual structure
+                        const chatRoomId = user.id;
                         const unreadCount = notifications.find(notification => notification.chat_room_id === chatRoomId)?.unread_messages_count || 0;
 
                         return (
                             <ChatUserItem
                                 user={user}
-                                userId={jwtDecode(accessToken).user_id}
+                                userId={userId}
                                 key={user.id}
                                 Chat={Chat}
                                 unreadCount={unreadCount}
@@ -81,12 +79,10 @@ const ChatUserItem = ({ user, userId, Chat = () => {}, unreadCount }) => {
     const isCurrentUser = user.user1.id === userId;
     const displayUser = !isCurrentUser ? user.user1 : user.user2;
 
-    // Determine user role
     const isStudent = displayUser.is_student;
     const isTeacher = displayUser.is_teacher;
     const isAdmin = displayUser.is_admin;
 
-    // Define user role label
     let roleLabel = '';
     if (isStudent) roleLabel = 'Student';
     if (isTeacher) roleLabel = 'Teacher';

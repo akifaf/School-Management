@@ -2,22 +2,14 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 
 import { createSlice } from '@reduxjs/toolkit';
 import { axiosInstance } from '../axios/AxiosInstance';
-import axios from 'axios';
 import { deleteTeacherFile } from '../axios/teacher.js/teacherServers';
-
 
 export const fetchTeacherFiles = createAsyncThunk(
   'files/fetchTeacherFiles',
-  async (_, { getState }) => {
-    const { auth } = getState();
-    const response = await axiosInstance.get('/teacher-files/', {
-      headers: {
-        Authorization: `Bearer ${auth.token}`,
-      },
-    });
-    return response.data;
-  }
-);
+   async (id) => {
+  const response = await axiosInstance.get(`/teacher-files/${id}/`);
+  return response.data;
+});
 
 const fileSlice = createSlice({
   name: 'files',

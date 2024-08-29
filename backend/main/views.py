@@ -54,7 +54,7 @@ def send_password_set_email(user):
     mail_subject = "Reset your password"
 
     link = f'http://localhost:3000/create-new-password/?uid={uid}&token={token}'
-    print(link, 'link---------')
+    # print(link, 'link---------')
 
     context = {
         "link": link,
@@ -87,12 +87,10 @@ class StudentRegisterView(generics.CreateAPIView):
             raise ValidationError(f"Class {class_room.get_class()} is full. Please assign the student to a different class or create a new section.")
         
         student = serializer.save(is_student=True)
-        print(student, 'student')
-        print(student.email, 'email')
         send_password_set_email(student)
 
 class TeacherRegisterView(generics.CreateAPIView):
-    # permission_classes = [IsAdminUser, IsAuthenticated]
+    permission_classes = [IsAdminUser, IsAuthenticated]
     queryset = Teacher.objects.all()
     serializer_class = TeacherSerializer
 
@@ -136,12 +134,10 @@ class StudentListUpdateView(generics.RetrieveUpdateDestroyAPIView):
         pk = self.kwargs.get('pk')
         return get_object_or_404(Student, id=pk)
 
-
 class StudentList(generics.ListAPIView):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
     permission_classes = [IsAdminUser, IsAuthenticated]
-
 
 class SubjectListCreateView(generics.ListCreateAPIView):
     queryset = Subject.objects.all()
@@ -158,7 +154,7 @@ class TeacherList(generics.ListAPIView):
 
 class TeacherView(generics.RetrieveUpdateAPIView):
     serializer_class = TeacherSerializer
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get_object(self):
         pk = self.kwargs.get('pk')
@@ -167,17 +163,19 @@ class TeacherView(generics.RetrieveUpdateAPIView):
 
 class TeacherFilesView(generics.ListAPIView):
     serializer_class = TeacherFileSerializer
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
+    
     def get_queryset(self):
-        user = self.request.user
+        pk = self.kwargs.get('id')
+        user = Teacher.objects.filter(id=pk).first()
         if user.is_teacher:
             return TeacherFile.objects.filter(teacher=user)
         return TeacherFile.objects.none()
     
 
 class TeacherFileDeleteView(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def delete(self, request, *args, **kwargs):
         file_id = kwargs.get('file_id')
@@ -185,10 +183,6 @@ class TeacherFileDeleteView(APIView):
             file_instance = TeacherFile.objects.get(id=file_id)
         except TeacherFile.DoesNotExist:
             return Response({"detail": "File not found."}, status=status.HTTP_404_NOT_FOUND)
-        
-        # # Check if the user is authorized to delete the file
-        # if request.user != file_instance.teacher:
-        #     return Response({"detail": "You do not have permission to delete this file."}, status=status.HTTP_403_FORBIDDEN)
         
         file_instance.delete()
         return Response({"detail": "File deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
@@ -214,7 +208,6 @@ class TeacherDetailView(APIView):
         serializer = TeacherSerializer(teacher)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
 class TeachersByClassView(APIView):
     
     def get(self, request, *args, **kwargs):
@@ -224,16 +217,12 @@ class TeachersByClassView(APIView):
             classroom = student.student.class_room
 
             syllabi = Syllabus.objects.filter(classroom=classroom)
-            # Extract teachers from syllabi
             teachers = set(syllabus.teacher for syllabus in syllabi)
 
-            # Serialize the teachers
             serializer = TeacherSerializer(teachers, many=True)
             return Response(serializer, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
 
 class BlockUserView(APIView):
     permission_classes = [IsAdminUser]
@@ -273,50 +262,15 @@ class TeacherClassListView(generics.ListAPIView):
             return classroom
         elif user.is_admin:
             classroom = Syllabus.objects.all().distinct()
-            return classroom        
+            return classroom
         return ClassRoom.objects.none()
 
 class ClassRoomAPIView(generics.ListCreateAPIView):
     queryset = ClassRoom.objects.all()
     serializer_class = ClassroomSerializer
-    # permission_classes = [IsAdminUser, IsAuthenticated]
-
+    permission_classes = [IsAuthenticated]
 
 class ClassUpdateView(generics.RetrieveUpdateDestroyAPIView):
     queryset = ClassRoom.objects.all()
     serializer_class = ClassroomSerializer
     
-    # def list(self, request):
-    #     queryset = self.get_queryset()
-    #     serializer = ClassroomSerializer(queryset, many=True)
-    #     return Response(serializer.data)
-    
-    # def get(self, request):
-    #     class_obj = ClassRoom.objects.all()
-    #     serializer = ClassroomSerializer(class_obj, many=True)
-    #     return Response(serializer.data)
-    
-
-
-# class TeacherListUpdateView(generics.RetrieveUpdateDestroyAPIView):
-#     serializer_class = TeacherSerializer
-#     def get_object(self):
-#         pk = self.kwargs.get('pk')
-#         return get_object_or_404(Teacher, user_id=pk)
-
-#     def put(self,request,*args, **kwargs):
-#         instance = self.get_object()
-#         # data = request.data.copy()
-#         # password = data.get('password')
-#         # if password:
-#         #     instance.set_password(password)
-#         #     instance.save()
-#         #     data.pop('password',None)
-#         print(request.data)
-#         serializer = self.get_serializer(instance, data=request.data, partial = True)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data)
-#         else:
-#             print(serializer.errors)
-#             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST) 

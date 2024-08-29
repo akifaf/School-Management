@@ -66,20 +66,19 @@ function AddResult() {
     }
   };
 
-  
   useEffect(() => {
     const fetchClassroom = async () => {
       const response = await dispatch(classByTeacher());
-      if (response.payload){
+      if (response.payload) {
         setClassrooms(response.payload.data);
       }
-    }
+    };
     fetchClassroom();
   }, []);
 
   useEffect(() => {
     dispatch(examTypeList());
-    dispatch(fetchSyllabus())
+    dispatch(fetchSyllabus());
   }, [dispatch]);
 
   useEffect(() => {
@@ -160,8 +159,12 @@ function AddResult() {
                     >
                       <option value="">-------------</option>
                       {classrooms?.map((classroom) => (
-                        <option key={classroom.id} value={classroom.classroom.id}>
-                          {classroom.classroom.class_no} {classroom.classroom.section}
+                        <option
+                          key={classroom.id}
+                          value={classroom.classroom.id}
+                        >
+                          {classroom.classroom.class_no}{" "}
+                          {classroom.classroom.section}
                         </option>
                       ))}
                     </select>
