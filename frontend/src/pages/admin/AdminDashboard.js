@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
-import AdminLayout from "../../layout/AdminLayout";
-import Sidebar from "../../components/admin/Sidebar";
 import { useDispatch, useSelector } from "react-redux";
 import CardDataStats from "../../components/admin/CardDataStats";
-import ChartThree from "../../components/Charts/ChartThree";
 import ChartTwo from "../../components/Charts/ChartTwo";
 import ChartOne from "../../components/Charts/ChartOne";
 import { classRoomList, studentList, subjectList, teacherList } from "../../axios/admin/AdminServers";
