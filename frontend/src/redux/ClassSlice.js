@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { addClassRoom, classRoomList, deleteClassRoom, editClassRoom } from '../axios/admin/AdminServers';
+import {  classRoomList } from '../axios/admin/AdminServers';
 
 const classroomSlice = createSlice({
   name: 'classrooms',

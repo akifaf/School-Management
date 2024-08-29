@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import AdminLayout from "../../layout/AdminLayout";
 import Sidebar from "../../components/admin/Sidebar";
 import { useDispatch, useSelector } from "react-redux";
@@ -6,7 +6,7 @@ import CardDataStats from "../../components/admin/CardDataStats";
 import ChartThree from "../../components/Charts/ChartThree";
 import ChartTwo from "../../components/Charts/ChartTwo";
 import ChartOne from "../../components/Charts/ChartOne";
-import { studentList } from "../../axios/admin/AdminServers";
+import { classRoomList, studentList, subjectList, teacherList } from "../../axios/admin/AdminServers";
 
 function AdminDashboard() {
 
@@ -14,11 +14,21 @@ function AdminDashboard() {
   const tokens = JSON.parse(localStorage.getItem('authTokens'));
   const accessToken = tokens.access;
   const refreshToken = tokens.refresh
-  const { student_list } = useSelector((store) => store.student);
+  const { subject_list } = useSelector((store) => store.subject);
+  const { teachers_list } = useSelector((store) => store.teacher);
+  const { classrooms } = useSelector((store) => store.classroom);
+  const [ students, setStudents ] = useState([])
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(studentList());
+    dispatch(subjectList());
+    dispatch(teacherList());
+    dispatch(classRoomList());
+    const fetchStudents = async () => {
+      const res = await dispatch(studentList())
+      setStudents(res.payload)
+    }
+    fetchStudents()
   }, [dispatch]);
 
 
@@ -26,7 +36,7 @@ function AdminDashboard() {
    
       <>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
-        <CardDataStats title="Total Students" total="433" >
+        <CardDataStats title="Total Students" total={students?.length} >
         <svg
             className="fill-primary dark:fill-white"
             width="22"
@@ -49,7 +59,7 @@ function AdminDashboard() {
             />
           </svg>
         </CardDataStats>
-        <CardDataStats title="Total Teacher" total="30" rate="4.35%" levelUp>
+        <CardDataStats title="Total Teacher" total={teachers_list?.length} rate="4.35%" levelUp>
           <svg
             className="fill-primary dark:fill-white"
             width="20"
@@ -72,7 +82,7 @@ function AdminDashboard() {
             />
           </svg>
         </CardDataStats>
-        <CardDataStats title="Total Classes" total="12" rate="2.59%" levelUp>
+        <CardDataStats title="Total Classes" total={classrooms?.length} rate="2.59%" levelUp>
           <svg
             className="fill-primary dark:fill-white"
             width="22"
@@ -91,7 +101,7 @@ function AdminDashboard() {
             />
           </svg>
         </CardDataStats>
-        <CardDataStats title="Total Subject" total="6" rate="0.95%" levelDown>
+        <CardDataStats title="Total Subject" total={subject_list?.length} rate="0.95%" levelDown>
           <svg
             className="fill-primary dark:fill-white"
             width="22"
@@ -118,7 +128,7 @@ function AdminDashboard() {
       <div className="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">
         <ChartOne />
         <ChartTwo />
-        <ChartThree />
+        {/* <ChartThree /> */}
       </div>
       </>
   );
