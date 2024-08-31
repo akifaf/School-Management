@@ -12,7 +12,7 @@ function AddTeacher() {
     last_name: "",
     email: "",
     phone_number: "",
-    subject: [], // Change from string to array
+    subject: [], 
     joined_date: "",
   });
 

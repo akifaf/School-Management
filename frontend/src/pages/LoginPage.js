@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Link, Navigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { Toaster, toast } from "sonner";
-import { loginUserAsync } from "../redux/AuthSlice";
 import { loginUser } from "../axios/apiServers";
 
 function LoginPage() {
@@ -29,7 +28,8 @@ function LoginPage() {
       } else if (is_student) {
         navigate("/student-dashboard");
       } else {
-        toast.error(
+        console.log(resultAction)
+        toast.error(          
           resultAction.payload || "Login Credentials does not match!"
         );
       }

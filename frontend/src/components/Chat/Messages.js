@@ -66,11 +66,11 @@ const Messages = ({ text, send, sender, timestamp, type, is_read }) => {
           display: "flex",
           alignItems: "center",
           justifyContent: "flex-end",
-          gap: "4px", // Adjust the gap between the icon and time if needed
+          gap: "4px", 
           color: "#555",
         }}
       >
-        {isSender && (!is_read ? <FaCheck /> : <FaCheckDouble />)}
+        {/* {isSender && (!is_read ? <FaCheck /> : <FaCheckDouble />)} */}
         {moment(timestamp).format("HH:mm")}
       </p>
     </MessageContainer>
@@ -87,13 +87,13 @@ const MessageContainer = styled.div`
   justify-content: ${({ isSender }) =>
     isSender
       ? "flex-end"
-      : "flex-start"}; // Align messages to right or left based on sender
+      : "flex-start"}; 
 `;
 
 
 const StyledImage = styled.img`
-  max-width: 150px; /* Adjust the maximum width as per your preference */
-  max-height: 160px; /* Adjust the maximum height as per your preference */
+  max-width: 150px; 
+  max-height: 160px; 
   margin: 0 10px;
   width: auto;
   border-radius: 5px;
@@ -101,8 +101,8 @@ const StyledImage = styled.img`
 `;
 
 const StyledVideo = styled.video`
-  max-width: 250px; /* Adjust the maximum width as per your preference */
-  max-height: 200px; /* Adjust the maximum height as per your preference */
+  max-width: 250px; 
+  max-height: 200px; 
   margin: 0 10px;
   width: auto;
   border-radius: 5px;

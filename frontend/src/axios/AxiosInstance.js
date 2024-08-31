@@ -19,7 +19,6 @@ axiosInstance.interceptors.request.use(
         const tokens = JSON.parse(localStorage.getItem('authTokens'));
         const accessToken = tokens.access;
         const refreshToken = tokens.refresh;
-        // const dispatch = useDispatch()
         if (accessToken) {
             config.headers.Authorization = `Bearer ${accessToken}`;
             const user = jwtDecode(accessToken)
@@ -32,7 +31,6 @@ axiosInstance.interceptors.request.use(
                 if (res.status === 200 || res.status === 201){
                     config.headers.Authorization = `Bearer ${res.data.access}`
                     localStorage.setItem('authTokens', JSON.stringify(res.data));
-                    // dispatch(updateAuthToken())
                 }else{
                     console.log(res)
                 }

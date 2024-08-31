@@ -17,7 +17,9 @@ export const loginUser = createAsyncThunk(
         });
   
         if (!response.ok) {
-          throw new Error("Login failed");
+          console.log(response.details);
+          
+          throw new Error("No active account found with the given credentials");
         }
   
         const data = await response.json();

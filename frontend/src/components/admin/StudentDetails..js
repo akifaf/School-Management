@@ -97,7 +97,7 @@ function StudentDetails({ student, onBack }) {
               <strong>Parent Contact:</strong> {studentDetails.parent_contact}
             </p>
             <p>
-              <strong>Address:</strong> {studentDetails.address}
+              {/* <strong>Address:</strong> {studentDetails.address} */}
             </p>
             <p>
               <strong>Date of Birth:</strong>{" "}

@@ -6,7 +6,6 @@ import { Link } from 'react-router-dom';
 function SubjectListView() {
   const dispatch = useDispatch();
   const { subject_list, status, error } = useSelector((store) => store.subject);
-  // const [editingUser, setEditingUser] = useState(null);
 
   useEffect(() => {
     dispatch(subjectList());

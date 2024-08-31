@@ -152,9 +152,6 @@ const SyllabusList = ({ classRoom }) => {
 
 
 const AddSyllabusForm = ({ onSuccess, classRoom }) => {
-  // const [classrooms, setClassrooms] = useState([]);
-  // const [subjects, setSubjects] = useState([]);
-  // const [teachers, setTeachers] = useState([]);
   const [selectedClassroom, setSelectedClassroom] = useState(classRoom);
   const [selectedSubject, setSelectedSubject] = useState("");
   const [selectedTeacher, setSelectedTeacher] = useState("");

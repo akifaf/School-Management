@@ -50,7 +50,7 @@ const AddStudent = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      console.log(formData.class_room);
+      // console.log(formData.class_room);
       const response = await studentRegister({
         phone_number: formData.phone_number,
         admission_date: formData.admission_date,
@@ -58,6 +58,8 @@ const AddStudent = () => {
         class_room: formData.class_room,
         first_name: formData.first_name,
         last_name: formData.last_name,
+        parent_contact: formData.parent_contact,
+        date_of_birth: formData.date_of_birth,
         email: formData.email,
         username: formData.first_name + " " + formData.last_name,
       });
@@ -215,6 +217,7 @@ const AddStudent = () => {
                 type="date"
                 value={formData.date_of_birth}
                 onChange={handleChange}
+                required
               />
             </div>
           </div>

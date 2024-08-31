@@ -1,8 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from "../axios";
 import { axiosFormInstance, axiosInstance, axiosResultInstance } from "../AxiosInstance";
-// import axios from 'axios';
-
 
 export const studentList = createAsyncThunk('student/studentList', async (_, thunkAPI) => {
   try {
@@ -167,19 +165,6 @@ export const updateTeacher = async ({ id, teacherData }) => {
     }
   }
 }
-
-// export const updateTeacher = createAsyncThunk(
-//   'teacher/updateTeacher',
-//   async ({ id, teacherData }, { rejectWithValue }) => {
-//     try {
-//       console.log(teacherData.subject);
-//       const response = await axiosFormInstance.patch(`teacher-update/${id}/`, teacherData);
-//       return response.data;
-//     } catch (error) {
-//       return rejectWithValue(error.response.data);
-//     }
-//   }
-// );
 
 export const uploadFiles = createAsyncThunk(
   'teacher/uploadFiles',

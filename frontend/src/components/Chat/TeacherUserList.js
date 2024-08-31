@@ -8,7 +8,7 @@ import { fetchTeacher } from '../../axios/teacher.js/teacherServers';
 import { toast } from 'react-toastify';
 import Loader from './Loader';
 import { Form, Col, Row } from 'react-bootstrap';
-import Pagination from './Pagination'; // Correct the Pagination import path
+import Pagination from './Pagination'; 
 
 const TeacherUserList = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -16,10 +16,10 @@ const TeacherUserList = () => {
   const usersPerPage = 10;
 
   const dispatch = useDispatch();
-  const { teachers_list: teachers, status, error } = useSelector((state) => state.teacher); // Adjust selector to match the state structure in teacherSlice
+  const { teachers_list: teachers, status, error } = useSelector((state) => state.teacher); 
 
   useEffect(() => {
-    dispatch(fetchTeacher()); // Dispatch the fetchTeacherList action
+    dispatch(fetchTeacher());
   }, [dispatch]);
 
   const filteredTeachers = teachers
