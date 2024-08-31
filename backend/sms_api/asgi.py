@@ -5,13 +5,14 @@ from chat.route import websocket_urlpatterns
 from chat.channels_middleware import JWTwebsocketMiddleware
 
 
-import django
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sms_api.settings")
-django.setup()
 
 
 from django.core.asgi import get_asgi_application
 application = get_asgi_application()
+
+import django
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sms_api.settings")
+django.setup()
 
 application = ProtocolTypeRouter({
     "http": application,  
