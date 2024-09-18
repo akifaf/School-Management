@@ -13,5 +13,5 @@ urlpatterns = [
     path('syllabus/<int:id>/', SyllabusDetailView.as_view(), name='syllabus-detail'),  
     path('syllabus_by_class/<int:id>/', SyllabusByClassroomView.as_view(), name='syllabus_by_class'),
     path('exam_type/', ExamTypeView.as_view(), name='exam_type_list_create'),
-    path('exam_type/<int:id>/', ExamTypeDetailView.as_view(), name='exam_type_detail'),
+    path('exam_type/<int:pk>/', ExamTypeDetailView.as_view(), name='exam_type_detail'),
 ]

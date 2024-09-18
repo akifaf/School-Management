@@ -10,6 +10,7 @@ import datetime
 
 
 class StudentListByClassAndDate(APIView):
+
     def get(self, request, class_id, date_str):
         class_room = ClassRoom.objects.get(id=class_id)
         students = Student.objects.filter(class_room=class_room)
@@ -32,6 +33,7 @@ class TakeAttendance(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class ViewAttendance(APIView):
+    
     def get(self, request, class_id, date):
         attendance_records = Attendance.objects.filter(student__class_room_id=class_id, date=date)
         serializer = AttendanceSerializer(attendance_records, many=True)
@@ -48,23 +50,10 @@ class ViewAttendance(APIView):
 
 class StudentAttendanceView(APIView):
     def get(self, request, student_id):
-        # Extract date parameters from the query parameters
+        
         from_date = request.query_params.get('from_date')
         to_date = request.query_params.get('to_date')
         
-        # Convert date parameters to datetime objects if they are provided
-        # if from_date:
-        #     try:
-        #         from_date = datetime.strptime(from_date, '%Y-%m-%d')
-        #     except ValueError:
-        #         return Response({'error': 'Invalid from_date format. Use YYYY-MM-DD.'}, status=status.HTTP_400_BAD_REQUEST)
-        # if to_date:
-        #     try:
-        #         to_date = datetime.strptime(to_date, '%Y-%m-%d')
-        #     except ValueError:
-        #         return Response({'error': 'Invalid to_date format. Use YYYY-MM-DD.'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Filter attendance records based on the provided dates
         if from_date and to_date:
             attendance_records = Attendance.objects.filter(student_id=student_id, date__range=[from_date, to_date])
         elif from_date:

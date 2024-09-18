@@ -93,23 +93,34 @@ class TeacherFile(models.Model):
 
 
 class ClassRoom(models.Model):
-    class_no = models.IntegerField()
-    section = models.CharField(max_length=1, null=True, blank=True)
+    class_no = models.IntegerField()  # Ensures positive integers only
+    section = models.CharField(max_length=10, null=True, blank=True)
     class_teacher = models.ForeignKey(Teacher, on_delete=models.DO_NOTHING)
 
     class Meta:
         ordering = ['class_no']
-    
+
     def __str__(self):
         return f'{self.class_no} {self.section}'
-    
+
     def get_class(self):
         return f'{self.class_no} {self.section}'
-    
+
     def clean(self):
+        # Convert section to uppercase before saving
+        if self.section:
+            self.section = self.section.upper()
+
+        # Validate uniqueness of class_no and section
         if ClassRoom.objects.filter(class_no=self.class_no, section=self.section).exclude(id=self.id).exists():
             raise ValidationError(f"ClassRoom with class_no {self.class_no} and section {self.section} already exists.")
-
+        
+        # Ensure section is a single alphabet character
+        if self.section and not self.section.isalpha():
+            raise ValidationError("Section must be a single alphabet character.")
+        
+        super(ClassRoom, self).clean()  # Call the parent clean() method
+        
     def is_full(self):
         MAX_STUDENTS_PER_CLASS = 30
         return self.student_set.count() >= MAX_STUDENTS_PER_CLASS

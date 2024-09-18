@@ -4,6 +4,8 @@ from django.utils.encoding import force_bytes, force_str
 from rest_framework import serializers
 from .models import TeacherFile, User, Student, Teacher, ClassRoom, Subject
 from django.core.exceptions import ValidationError
+from datetime import date
+import re
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -53,18 +55,35 @@ class PasswordResetSerializer(serializers.Serializer):
 
 class ClassroomSerializer(serializers.ModelSerializer):
 
-    # teacher = TeacherSerializer()
-
     class Meta:
         model = ClassRoom
         fields = ['id', 'class_no', 'section', 'class_teacher', 'class_strength', 'syllabus_count']
 
+    def validate_class_no(self, value):
+        """Ensure class_no is a positive integer"""
+        if value <= 0:
+            raise serializers.ValidationError("Class number must be a positive integer.")
+        return value
+
+    def validate_section(self, value):
+        """Ensure section is a single uppercase alphabet letter"""
+        if not value.isalpha() or len(value) != 1:
+            raise serializers.ValidationError("Section must be a single alphabetic character.")
+        
+        return value.upper()  # Always return the uppercase version
+
     def validate(self, attrs):
-        if self.instance: 
-            if ClassRoom.objects.filter(class_no=attrs.get('class_no'), section=attrs.get('section')).exclude(id=self.instance.id).exists():
+        """Ensure uniqueness of class_no and section combination"""
+        class_no = attrs.get('class_no')
+        section = attrs.get('section')
+
+        if self.instance:
+            # When updating
+            if ClassRoom.objects.filter(class_no=class_no, section=section).exclude(id=self.instance.id).exists():
                 raise serializers.ValidationError("ClassRoom with this Class No and Section already exists.")
-        else: 
-            if ClassRoom.objects.filter(class_no=attrs.get('class_no'), section=attrs.get('section')).exists():
+        else:
+            # When creating
+            if ClassRoom.objects.filter(class_no=class_no, section=section).exists():
                 raise serializers.ValidationError("ClassRoom with this Class No and Section already exists.")
 
         return attrs
@@ -75,6 +94,28 @@ class StudentSerializer(serializers.ModelSerializer):
         model = Student
         fields = ['id', 'username', 'email', 'password', 'first_name', 'last_name', 'date_of_birth', 'address', 'phone_number', 'profile_picture', 'is_student', 'is_teacher', 'is_admin', 'is_active', 'admission_date', 'parent_contact', 'class_room', 'roll_no']
 
+    def validate_email(self, value):
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", value):
+            raise serializers.ValidationError("Invalid email format.")
+        return value
+
+    def validate_first_name(self, value):
+        if not value.strip():
+            raise serializers.ValidationError("Name cannot be empty.")
+        if not re.match("^[A-Za-z ]+$", value): 
+            raise serializers.ValidationError("Name can only contain alphabetic characters.")
+        return value
+
+    def validate_last_name(self, value):
+        if value is not None and not re.match("^[A-Za-z ]+$", value): 
+            raise serializers.ValidationError("Name can only contain alphabetic characters.")
+        return value
+
+    def validate_date_of_birth(self, value):
+        if value > date.today():
+            raise serializers.ValidationError("Date of birth cannot be in the future.")
+        return value
+    
     def create(self, validated_data):
         student = Student.objects.create(**validated_data)
         
@@ -85,13 +126,13 @@ class StudentSerializer(serializers.ModelSerializer):
 
         return student 
         
-    def __init__(self, *args, **kwargs):
-        super(StudentSerializer, self).__init__(*args, **kwargs)
-        request = self.context.get("request")
-        if request and request.method == "POST":
-            self.Meta.depth = 0
-        else:
-            self.Meta.depth = 2
+    # def __init__(self, *args, **kwargs):
+    #     super(StudentSerializer, self).__init__(*args, **kwargs)
+    #     request = self.context.get("request")
+    #     if request and request.method == "POST":
+    #         self.Meta.depth = 2
+    #     else:
+    #         self.Meta.depth = 2
         
   
     def update(self, instance, validated_data):
@@ -122,6 +163,21 @@ class TeacherSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'email', 'password', 'first_name', 'last_name', 'date_of_birth', 'address', 'phone_number', 'profile_picture', 'is_student', 'is_teacher', 'is_admin', 'is_active', 'joined_date', 'subject', 'files']
         extra_kwargs = {'password': {'write_only': True}}
 
+    def validate_email(self, value):
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", value):
+            raise serializers.ValidationError("Invalid email format.")
+        return value
+
+    def validate_first_name(self, value):
+        if not re.match("^[A-Za-z ]+$", value):  
+            raise serializers.ValidationError("Name can only contain alphabetic characters.")
+        return value
+
+    def validate_last_name(self, value):
+        if not value.strip():
+            raise serializers.ValidationError("Last name cannot be empty.")
+        return value
+    
     def create(self, validated_data):
         subject_data = validated_data.pop('subject')
         teacher = Teacher.objects.create(**validated_data)
@@ -136,7 +192,6 @@ class TeacherSerializer(serializers.ModelSerializer):
         subject_data = validated_data.pop('subject', None)
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
-        print(validated_data)
         if subject_data is not None:
             instance.subject.set(subject_data)
         instance.save()
