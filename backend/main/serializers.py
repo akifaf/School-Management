@@ -60,20 +60,17 @@ class ClassroomSerializer(serializers.ModelSerializer):
         fields = ['id', 'class_no', 'section', 'class_teacher', 'class_strength', 'syllabus_count']
 
     def validate_class_no(self, value):
-        """Ensure class_no is a positive integer"""
         if value <= 0:
             raise serializers.ValidationError("Class number must be a positive integer.")
         return value
 
     def validate_section(self, value):
-        """Ensure section is a single uppercase alphabet letter"""
         if not value.isalpha() or len(value) != 1:
             raise serializers.ValidationError("Section must be a single alphabetic character.")
         
         return value.upper()  # Always return the uppercase version
 
     def validate(self, attrs):
-        """Ensure uniqueness of class_no and section combination"""
         class_no = attrs.get('class_no')
         section = attrs.get('section')
 

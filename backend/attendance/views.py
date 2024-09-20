@@ -1,6 +1,10 @@
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.permissions import IsAuthenticated
+
+from result.models import Syllabus
 from .models import Attendance
 from main.models import Student, ClassRoom
 from .serializers import AttendanceSerializer
@@ -24,16 +28,28 @@ class StudentListByClassAndDate(APIView):
         })
 
 class TakeAttendance(APIView):
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         serializer = AttendanceSerializer(data=request.data, many=True)
+        user = request.user
+        if user.is_teacher:
+            student_ids = [attendance.get('student') for attendance in request.data]
+            students = Student.objects.filter(id__in=student_ids)
+            print(students)
+            classroom = students.first().class_room
+            assigned_syllabus = Syllabus.objects.filter(classroom=classroom, teacher=user)
+            if not assigned_syllabus.exists():
+                raise PermissionDenied("You are not authorized to take attendance for this class.")
+        else :
+            raise PermissionDenied("You are not authorized to take attendance.")        
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class ViewAttendance(APIView):
-    
+     
     def get(self, request, class_id, date):
         attendance_records = Attendance.objects.filter(student__class_room_id=class_id, date=date)
         serializer = AttendanceSerializer(attendance_records, many=True)
