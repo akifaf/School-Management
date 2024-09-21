@@ -7,12 +7,14 @@ import { Button } from "react-bootstrap";
 import { FaArrowAltCircleLeft } from "react-icons/fa";
 import { addChatRoom } from "../../axios/chat/ChatServers";
 import { useNavigate } from "react-router-dom";
+import { classDetail } from "../../axios/admin/AdminServers";
 
 function StudentDetails({ student, onBack }) {
   const dispatch = useDispatch();
   const { user } = useSelector((store) => store.auth);
   const [studentDetails, setStudentDetails] = useState(null);
   const navigate = useNavigate();
+  const [classDetails, setClassDetails ] = useState(null);
 
   const handleSendMessage = async (studentId) => {
     console.log(`Send message to teacher with ID: ${studentId}`);
@@ -34,12 +36,22 @@ function StudentDetails({ student, onBack }) {
       try {
         const details = await dispatch(fetchStudentDetails(student.id));
         setStudentDetails(details.payload);
+
+        // Fetch class details using the class_room ID
+        if (details.payload.class_room) {
+          const classData = await dispatch(classDetail(details.payload.class_room));
+          setClassDetails(classData.payload); 
+          
+        }
       } catch (error) {
-        console.log("Error fetching student details: ", error);
+        console.log("Error fetching student or class details:", error);
       }
     };
+
     fetchDetails();
-  }, [dispatch, student.id]);
+  }, []);
+
+
 
   if (!studentDetails) {
     return <div>Loading...</div>;
@@ -78,8 +90,8 @@ function StudentDetails({ student, onBack }) {
               {studentDetails.first_name} {studentDetails.last_name}
             </h3>
             <h5 className="mb-1.5 text-2xl font-semibold text-black dark:text-white">
-              Class : {studentDetails.class_room.class_no}{" "}
-              {studentDetails.class_room.section}
+              Class : {classDetails?.class_no}{" "}
+              {classDetails?.section}
             </h5>
             {/* <p className="font-medium">{studentDetails.phone_number}</p> */}
             <p className="font-medium">{studentDetails.email}</p>

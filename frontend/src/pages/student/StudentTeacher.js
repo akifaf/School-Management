@@ -33,20 +33,21 @@ const handleSendMessage = async (teacherId) => {
     const fetchDetails = async () => {
       try {
         const details = await dispatch(fetchStudentDetails(user.id));
-        setStudentDetails(details.payload);
+        setStudentDetails(details.payload);        
       } catch (error) {
         console.log("Error fetching student details: ", error);
       }
     };
     fetchDetails();
   }, [dispatch, user.id]);
-
+  
   useEffect(() => {
     const fetchTeacher = async () => {
-      if (studentDetails?.class_room?.id) {
+      if (studentDetails?.class_room) {
         try {
-          const response = await dispatch(syllabusByClass(studentDetails.class_room.id));
+          const response = await dispatch(syllabusByClass(studentDetails.class_room));
           setTeachers(response.payload);
+          console.log(response.payload)
         } catch (error) {
           console.log("Error fetching syllabus: ", error);
         }
@@ -55,7 +56,7 @@ const handleSendMessage = async (teacherId) => {
 
     if (studentDetails) {
       fetchTeacher();
-    }
+     }
   }, [studentDetails]);
 
   

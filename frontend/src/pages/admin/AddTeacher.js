@@ -60,11 +60,20 @@ function AddTeacher() {
       email: formData.email,
       username: formData.first_name + " " + formData.last_name,
     });
-
+    
     if (teacherResponse.error) {
       if (teacherResponse.error.email) {
         toast.error(teacherResponse.error.email);
+      } else if (teacherResponse.error.roll_no) {
+        toast.error(teacherResponse.error.roll_no);
+      } else if (teacherResponse.error.first_name) {
+        toast.error(teacherResponse.error.first_name); 
+      } else if (teacherResponse.error.last_name) {
+        toast.error(teacherResponse.error.last_name); 
+      } else if (teacherResponse.error.date_of_birth) {
+        toast.error(teacherResponse.error.date_of_birth); 
       } else {
+        console.log(teacherResponse)
         toast.error("Something went wrong");
       }
     } else {

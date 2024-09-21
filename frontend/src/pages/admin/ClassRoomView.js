@@ -43,10 +43,17 @@ function ClassRoomView() {
     };
 
     try {
-      const response = await dispatch(editClassRoom({ id: editingClassroom.id, classRoomData: formDataToSend }));
+      const response = await editClassRoom({ id: editingClassroom.id, classRoomData: formDataToSend });
       
       if (response.error) {
-        toast.error(response.error);
+        if (response.error.class_no) {
+          toast.error(response.error.class_no);
+        } else if (response.error.section) {
+          toast.error(response.error.section);
+        } else {
+          toast.error(response.error.non_field_errors[0]
+          );
+        }
       } else {
         toast.success("Classroom updated successfully");
         setEditingClassroom(null);

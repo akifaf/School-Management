@@ -231,7 +231,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                       fill=""
                     />
                   </svg>
-                  Add result
+                  Add Result
                 </NavLink>
               </li>
               {/* <!-- Menu Item Teacher --> */}

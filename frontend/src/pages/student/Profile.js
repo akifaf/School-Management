@@ -4,29 +4,39 @@ import { toast, Toaster } from 'sonner'; // Assuming you have a toast notificati
 import { fetchStudentDetails } from '../../redux/StudentDetailSlice';
 import { updateStudentProfile } from '../../axios/student/StudentServers';
 import defaultProfile from '../../images/user/default_profile.png';
+import { classDetail } from '../../axios/admin/AdminServers';
 
 function StudentProfile() {
   const { user } = useSelector(store => store.auth);
   const dispatch = useDispatch();
   const [studentDetails, setStudentDetails] = useState(null);
   const [profilePicture, setProfilePicture] = useState(null);
+  const [classDetails, setClassDetails ] = useState(null);
 
   useEffect(() => {
     const fetchDetails = async () => {
       try {
         const details = await dispatch(fetchStudentDetails(user.id));
         setStudentDetails(details.payload);
+
+        // Fetch class details using the class_room ID
+        if (details.payload.class_room) {
+          const classData = await dispatch(classDetail(details.payload.class_room));
+          setClassDetails(classData.payload); 
+          
+        }
       } catch (error) {
-        console.log("Error fetching student details: ", error);
+        console.log("Error fetching student or class details:", error);
       }
     };
+
     fetchDetails();
-  }, [dispatch, user.id]);
+  }, [dispatch, user.id, classDetails]);
+
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      console.log(file);
       setProfilePicture(file);
     }
   };
@@ -110,7 +120,7 @@ function StudentProfile() {
               {studentDetails.first_name} {studentDetails.last_name}
             </h3>
             <h5 className="mb-1.5 text-2xl font-semibold text-black dark:text-white">
-              Class : {studentDetails.class_room.class_no} {studentDetails.class_room.section}
+              Class : {classDetails?.class_no} {classDetails?.section}
             </h5>
             {/* <p className="font-medium">{studentDetails.phone_number}</p> */}
             <p className="font-medium">{studentDetails.email}</p>

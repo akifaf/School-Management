@@ -24,10 +24,17 @@ const StudentAttendance = ({ studentId }) => {
         maxDate: "today",
         onChange: (selectedDates) => {
           if (selectedDates.length === 2) {
-            setFromDate(selectedDates[0].toISOString().split('T')[0]);
-            setToDate(selectedDates[1].toISOString().split('T')[0]);
+            const formatDate = (date) => {
+              const year = date.getFullYear();
+              const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+              const day = String(date.getDate()).padStart(2, '0');
+              return `${year}-${month}-${day}`;
+            };
+            setFromDate(formatDate(selectedDates[0]));
+            setToDate(formatDate(selectedDates[1]));
           }
         },
+        
       });
     }
   }, []);

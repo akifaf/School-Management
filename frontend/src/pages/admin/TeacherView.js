@@ -111,10 +111,20 @@ function TeacherView() {
     const response = await updateTeacher({ id: editingUser.id, teacherData });
 
     setEditingUser(null);
+
     if (response.error) {
       if (response.error.email) {
         toast.error(response.error.email);
+      } else if (response.error.roll_no) {
+        toast.error(response.error.roll_no);
+      } else if (response.error.first_name) {
+        toast.error(response.error.first_name); 
+      } else if (response.error.last_name) {
+        toast.error(response.error.last_name); 
+      } else if (response.error.date_of_birth) {
+        toast.error(response.error.date_of_birth); 
       } else {
+        console.log(response)
         toast.error("Something went wrong");
       }
     } else {

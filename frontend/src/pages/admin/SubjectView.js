@@ -33,7 +33,6 @@ function SubjectView() {
     try {
       const response = await dispatch(editSubject({ id: editingSubject.id, subject: formDataToSend }));
       if (response.error) {
-        console.log(response.payload.subject, 'from her'); 
         toast.error(response.payload.subject); 
       } else {
         toast.success("Subject updated successfully", response.payload)
@@ -41,7 +40,6 @@ function SubjectView() {
       }
     } catch (error) {
       console.log('Error in handleSubmit:', error);
-
     }
   };
   

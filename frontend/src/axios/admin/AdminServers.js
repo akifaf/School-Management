@@ -88,15 +88,44 @@ export const classRoomList = createAsyncThunk('classrooms/class_list', async () 
 }
 })
 
-export const addClassRoom = createAsyncThunk('classrooms/add', async (classRoomData) => {
-  const response = await axiosInstance.post('/classroom/', classRoomData);
-  return response;
-});
+// export const addClassRoom = createAsyncThunk('classrooms/add', async (classRoomData) => {
+//   try {
+//     const response = await axiosInstance.post('/classroom/', classRoomData);
+//     return response.payload;
+//   } catch (error) {
+//     return {
+//       error: error.response ? error.response.data : 'Something went wrong'
+//     }
+//   }
+// });
 
-export const editClassRoom = createAsyncThunk('classrooms/edit', async ({ id, classRoomData }) => {
-  const response = await axiosInstance.put(`/classroom/${id}/`, classRoomData);
+export const addClassRoom = async (classRoomData) => {
+  try {
+    const response = await axiosInstance.post('/classroom/', classRoomData);
+    return response.data;
+  } catch (error) {
+    return {
+      error: error.response ? error.response.data : 'Something went wrong'
+    };
+  }
+};
+
+
+export const classDetail = createAsyncThunk('classrooms/detail', async (id) => {
+  const response = await axiosInstance.get(`/classroom/${id}/`);
   return response.data;
 });
+
+export const editClassRoom = async ({ id, classRoomData }) => {
+  try {
+    const response = await axiosInstance.put(`/classroom/${id}/`, classRoomData);
+    return response.data;
+    } catch (error) {
+      return {
+        error: error.response ? error.response.data : 'Something went wrong'
+      };
+  }
+};
 
 export const deleteClassRoom = createAsyncThunk('classrooms/delete', async (id) => {
   await axiosInstance.delete(`/classroom/${id}/`);
@@ -128,17 +157,16 @@ export const fetchTeacherDetails = createAsyncThunk(
   }
 );
 
-
 export const updateStudent = createAsyncThunk(
   'student/updateStudent',
-  async ({ id, studentData }, { rejectWithValue }) => {
+  async ({ id, studentData }) => {
     try {
-      console.log('stue', studentData);
       const response = await axiosFormInstance.patch(`student/${id}/`, studentData);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
-    }
+      return {
+        error: error.response ? error.response.data : 'Something went wrong'
+      };    }
   }
 );
 

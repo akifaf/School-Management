@@ -3,21 +3,19 @@ import { useDispatch, useSelector } from "react-redux";
 import { axiosInstance } from "../../axios/AxiosInstance";
 import { Toaster } from "sonner";
 import StudentView from "./StudentView";
-import { teacherList } from "../../axios/admin/AdminServers";
+import { classRoomList, teacherList } from "../../axios/admin/AdminServers";
 
 function ClassView() {
   const dispatch = useDispatch();
-  const [classRooms, setClassRooms] = useState([]);
+  // const [classRooms, setClassRooms] = useState([]);
+  const { classrooms, status, error } = useSelector((store) => store.classroom);
   const [selectedClass, setSelectedClass] = useState(null);
   const teachers = useSelector((state) => state.teacher.teachers_list);
   const teacherStatus = useSelector((state) => state.teacher.status);
 
   useEffect(() => {
-    axiosInstance
-      .get("classroom/")
-      .then((response) => setClassRooms(response.data))
-      .catch((error) => console.error("Error fetching classrooms:", error));
-  }, []);
+    dispatch(classRoomList());
+  }, [dispatch]);
 
   useEffect(() => {
     if (!teachers && teacherStatus !== "loading") {
@@ -31,6 +29,7 @@ function ClassView() {
 
   const handleBack = () => {
     setSelectedClass(null);
+    dispatch(classRoomList());
   };
 
   return (
@@ -43,7 +42,7 @@ function ClassView() {
             Student Management
           </h1>
           <div className="flex flex-wrap gap-4 justify-center">
-            {classRooms.map((classItem, index) => (
+            {classrooms?.map((classItem, index) => (
               <div
                 key={index}
                 className="max-w-xs p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 flex-1 sm:flex-none sm:w-1/3 cursor-pointer"

@@ -22,7 +22,11 @@ const ViewAttendance = () => {
     const fetchClassroom = async () => {
       const response = await dispatch(classByTeacher());
       if (response.payload) {
-        setClassrooms(response.payload.data); // Ensure data structure is correct
+        const fetchedClassrooms = response.payload.data;
+        const distinctClassrooms = Array.from(
+          new Map(fetchedClassrooms.map(item => [item.classroom.id, item.classroom])).values()
+        );
+        setClassrooms(distinctClassrooms);
       }
     };
     fetchClassroom();
@@ -32,7 +36,7 @@ const ViewAttendance = () => {
     flatpickr(datepickerRef.current, {
       mode: "single",
       dateFormat: "Y-m-d",
-      maxDate: "today",
+      // maxDate: "today",
       onChange: (selectedDates, dateStr) => {
         setSelectedDate(dateStr);
       },
@@ -53,12 +57,12 @@ const ViewAttendance = () => {
     }
 
     dispatch(studentListByClass({
-      class_no: selectedClassroom.classroom.class_no,
-      section: selectedClassroom.classroom.section,
+      class_no: selectedClassroom.class_no,
+      section: selectedClassroom.section,
     }));
 
     axiosAttendanceInstance
-      .get(`view_attendance/${selectedClassroom.classroom.id}/${selectedDate}/`)
+      .get(`view_attendance/${selectedClassroom.id}/${selectedDate}/`)
       .then((response) => {
         if (response.data.length === 0) {
           toast.warning("No Data found");
@@ -75,10 +79,8 @@ const ViewAttendance = () => {
 
   const handleClassChange = (e) => {
     const classId = e.target.value;
-    const classroom = classrooms?.find((c) => c.classroom.id === parseInt(classId));
-    setSelectedClassroom(classroom);
-    console.log(classroom.classroom);
-    
+    const classroom = classrooms?.find((c) => c.id === parseInt(classId));
+    setSelectedClassroom(classroom);    
   };
 
   const handleSubmit = (e) => {
@@ -125,14 +127,14 @@ const ViewAttendance = () => {
               </label>
               <select
                 onChange={handleClassChange}
-                value={selectedClassroom ? selectedClassroom.classroom.id : ""}
+                value={selectedClassroom ? selectedClassroom.id : ""}
                 className="block w-full bg-gray-200 border border-gray-200 text-gray-700 py-2 px-3 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                 required
               >
                 <option value="">Select a classroom</option>
                 {classrooms.map((classroom) => (
-                  <option key={classroom.classroom.id} value={classroom.classroom.id}>
-                    {classroom.classroom.class_no} {classroom.classroom.section}
+                  <option key={classroom.id} value={classroom.id}>
+                    {classroom.class_no} {classroom.section}
                   </option>
                 ))}
               </select>
@@ -217,13 +219,12 @@ const ViewAttendance = () => {
                           <input
                             type="checkbox"
                             checked={attendance[student.student] || false}
-                            onChange={(e) =>
+                            onChange={(e) => {
                               setAttendance({
                                 ...attendance,
                                 [student.student]: e.target.checked,
-                              })
-                            }
-                            className="form-checkbox h-4 w-4 text-blue-600 mx-8"
+                              });
+                            }}
                             disabled={isPastDate(selectedDate)}
                           />
                         </td>
@@ -233,16 +234,13 @@ const ViewAttendance = () => {
                 </tbody>
               </table>
             </div>
-          </div>
-          {!isPastDate(selectedDate) && (
             <button
-
+              className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 mt-4"
               type="submit"
-              className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 mt-4"
             >
               Update Attendance
             </button>
-          )}
+          </div>
         </form>
       )}
     </div>

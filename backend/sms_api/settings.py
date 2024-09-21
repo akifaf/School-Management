@@ -25,15 +25,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-yv#&8*=-$##_vtgsbf65wj5ayq(2w=7^*+28!0y+lfsl0#bk62'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-# SECURE_SSL_REDIRECT = True
+ALLOWED_HOSTS = ['13.210.112.224', '127.0.0.1', 'localhost', 'kiddos.cloud', 'www.kiddos.cloud',]
 
-# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-ALLOWED_HOSTS = ['13.210.112.224', 'localhost', 'kiddos.cloud', 'www.kiddos.cloud',]
-
-CSRF_TRUSTED_ORIGINS = ['https://kiddos.cloud',]
 
 # Application definition
 
@@ -50,47 +45,27 @@ INSTALLED_APPS = [
     'attendance',
     'result',
     'chat',
-
+    
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
 ]
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'django_debug.log'),
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-    },
-}
-
-
 REST_FRAMEWORK = {
-
+    
     'DEFAULT_AUTHENTICATION_CLASSES': (
 
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
-
+    
 }
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-
+    
     "corsheaders.middleware.CorsMiddleware",
-
+    
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -125,7 +100,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
+            "hosts": [('127.0.0.1', 6379)], 
         },
     },
 }
@@ -134,23 +109,23 @@ CHANNEL_LAYERS = {
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'sms_db',
-        'USER': 'django',
-        'PASSWORD': 'hellopostakifa',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'sms_db', 
+#         'USER': 'django',
+#         'PASSWORD': 'hellopostakifa',
+#         'HOST': '127.0.0.1', 
+#         'PORT': '5432',
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -192,7 +167,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # media files configuration
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR /'media'
+MEDIA_ROOT = BASE_DIR /'media' 
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -245,7 +220,7 @@ SIMPLE_JWT = {
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "https://school-management-system-azure-kappa.vercel.app",
+    "https://school-management-sigma-one.vercel.app",  
     "http://localhost:8080",
     "http://127.0.0.1:9000",
 ]

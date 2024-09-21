@@ -46,7 +46,7 @@ const AttendanceForm = () => {
         section: selectedClassroom.section,
       })
     );
-    console.log("response", responses);
+    // console.log("response", responses);
     if (!responses.error) {
       setStudents(responses.payload);
       console.log(students);
@@ -64,11 +64,9 @@ const AttendanceForm = () => {
       date: selectedDate,
       present: attendance[student.id],
     }));
-    console.log(attendanceData);
     const response = await take_attendance(attendanceData);
     console.log(response);
     if (response.error) {
-      console.log(response.error[0]["unique"]);
       toast.error(response.error[0]["unique"]);
       setStudents([]);
       // navigate("/view-attendance");

@@ -10,6 +10,8 @@ const AddClassRoom = () => {
     section: "",
     class_teacher: "",
   });
+  const Swal = require('sweetalert2')
+
   
   const { teachers_list } = useSelector((store) => store.teacher); 
   const dispatch = useDispatch();
@@ -27,16 +29,27 @@ const AddClassRoom = () => {
     e.preventDefault();
 
     try {
-      const response = await dispatch(addClassRoom(formData)); 
-
+      const response = await addClassRoom(formData);
+      
       if (response.error) {
-        console.log(response)
-        if (response.error.non_field_errors) {
-          toast.error(response.error.non_field_errors);
+        if (response.error.class_no) {
+          toast.error(response.error.class_no);
+        } else if (response.error.section) {
+          toast.error(response.error.section);
         } else {
-          toast.error("Something went wrong");
+          toast.error(response.error.non_field_errors[0]
+          );
         }
       } else {
+        
+        Swal.fire({
+          icon: "success",
+          showConfirmButton: false,
+          text: "Class added successfully",
+          timer: 1500
+        });
+
+        toast('heloo')
         toast.success('Class added successfully');
         setFormData({
           class_no: "",

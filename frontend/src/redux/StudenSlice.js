@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import {  studentList, studentListByClass, updateStudent } from "../axios/admin/AdminServers";
+import {  studentList, studentListByClass } from "../axios/admin/AdminServers";
 // import { studentList } from "../axios/AdminServers";
 
 const initialState = {
@@ -26,21 +26,7 @@ const studentSlice = createSlice({
             .addCase(studentListByClass.rejected, (state, action) => {
               state.loading = false;
               state.error = action.payload;
-            })
-            .addCase(updateStudent.pending, (state) => {
-                state.status = 'loading';
-            })
-            .addCase(updateStudent.fulfilled, (state, action) => {
-              state.status = 'succeeded';
-              const updatedStudent = action.payload;
-              state.student_list = state.student_list.map((student) =>
-                student.id === updatedStudent.id ? updatedStudent : student
-              );
-            })
-            .addCase(updateStudent.rejected, (state, action) => {
-              state.status = 'failed';
-              state.error = action.payload;
-            })            
+            })      
             
   }
 });

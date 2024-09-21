@@ -68,7 +68,14 @@ const AddStudent = () => {
           toast.error(response.error.email);
         } else if (response.error.roll_no) {
           toast.error(response.error.roll_no);
+        } else if (response.error.first_name) {
+          toast.error(response.error.first_name); 
+        } else if (response.error.last_name) {
+          toast.error(response.error.last_name); 
+        } else if (response.error.date_of_birth) {
+          toast.error(response.error.date_of_birth); 
         } else {
+          console.log(response)
           toast.error("Something went wrong");
         }
       } else {
@@ -115,7 +122,7 @@ const AddStudent = () => {
                 type="text"
                 value={formData.first_name}
                 onChange={handleChange}
-                placeholder="Jane"
+                placeholder="Enter First Name"
                 required
               />
             </div>
@@ -134,24 +141,10 @@ const AddStudent = () => {
                 type="text"
                 value={formData.last_name}
                 onChange={handleChange}
-                placeholder="Doe"
+                placeholder="Enter Last Name"
                 required
               />
             </div>
-            {/* <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="first_name">
-              UserName
-            </label>
-            <input
-              className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-              id="username"
-              name="username"
-              type="text"
-              value={formData.username}
-              onChange={handleChange}
-              placeholder="Jane"
-            />
-          </div> */}
           </div>
 
           <div className="flex flex-wrap -mx-3 mb-6">

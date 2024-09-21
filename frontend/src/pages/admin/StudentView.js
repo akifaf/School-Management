@@ -100,7 +100,20 @@ function StudentView({ classRoom, onBack }) {
       ).unwrap();
       setEditingUser(null);
       if (response.error) {
-        toast.error(response.error);
+        if (response.error.email) {
+          toast.error(response.error.email);
+        } else if (response.error.roll_no) {
+          toast.error(response.error.roll_no);
+        } else if (response.error.first_name) {
+          toast.error(response.error.first_name); 
+        } else if (response.error.last_name) {
+          toast.error(response.error.last_name); 
+        } else if (response.error.date_of_birth) {
+          toast.error(response.error.date_of_birth); 
+        } else {
+          console.log(response)
+          toast.error("Something wendast wrong");
+        }
       } else {
         dispatch(
           studentListByClass({
@@ -337,7 +350,7 @@ function StudentView({ classRoom, onBack }) {
                     type="text"
                     value={formData.first_name}
                     onChange={handleChange}
-                    placeholder="Jane"
+                    placeholder="Enter First Name"
                     required
                   />
                 </div>
@@ -355,7 +368,7 @@ function StudentView({ classRoom, onBack }) {
                     type="text"
                     value={formData.last_name}
                     onChange={handleChange}
-                    placeholder="Doe"
+                    placeholder="Enter Last Name"
                     required
                   />
                 </div>
