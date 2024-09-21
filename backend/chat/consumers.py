@@ -79,11 +79,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def mark_message_as_read(self, message_id):
         try:
             message = Messages.objects.get(id=message_id)
-            if message.user.id != self.request_user.id:  # Ensure it's the recipient
-                print(message, '..............')
+            if message.user.id != self.request_user.id: 
                 message.is_read = True
                 message.save()
-                print(message, '..............')
         except Messages.DoesNotExist:
             pass
 

@@ -36,7 +36,6 @@ class TakeAttendance(APIView):
         if user.is_teacher:
             student_ids = [attendance.get('student') for attendance in request.data]
             students = Student.objects.filter(id__in=student_ids)
-            print(students)
             classroom = students.first().class_room
             assigned_syllabus = Syllabus.objects.filter(classroom=classroom, teacher=user)
             if not assigned_syllabus.exists():
@@ -57,7 +56,6 @@ class ViewAttendance(APIView):
 
     def put(self, request, class_id, date):
         today = datetime.date.today()
-        print(today)
         for record in request.data:
             attendance = Attendance.objects.get(student_id=record['student'], date=date)
             attendance.present = record['present']

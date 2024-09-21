@@ -18,7 +18,7 @@ class MessageListView(generics.ListCreateAPIView):
         try:
             chat_room = ChatRooms.objects.filter(
                 Q(user1_id = user_id1, user2_id = user_id2) | Q(user1_id = user_id2, user2_id = user_id1))
-            print("_____",chat_room)
+            # print("_____",chat_room)
             if not chat_room:
                 raise NotFound('Room not found')
             messages = Messages.objects.filter(chat_room__in = chat_room).order_by('-timestamp')
